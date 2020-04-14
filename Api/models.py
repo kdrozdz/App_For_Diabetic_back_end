@@ -43,6 +43,7 @@ class Patient(models.Model):
 class Doctor(models.Model):
     user = models.OneToOneField(User, on_delete=models.CASCADE)
 
+
     def __str__(self):
         return self.descript()
 

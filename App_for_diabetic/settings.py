@@ -40,11 +40,13 @@ INSTALLED_APPS = [
     'Api',
     'rest_framework',
     'rest_framework.authtoken',
+    'corsheaders',
 ]
 
 MIDDLEWARE = [
     'django.middleware.security.SecurityMiddleware',
     'django.contrib.sessions.middleware.SessionMiddleware',
+    'corsheaders.middleware.CorsMiddleware',
     'django.middleware.common.CommonMiddleware',
     'django.middleware.csrf.CsrfViewMiddleware',
     'django.contrib.auth.middleware.AuthenticationMiddleware',
@@ -53,6 +55,13 @@ MIDDLEWARE = [
 ]
 
 ROOT_URLCONF = 'App_for_diabetic.urls'
+
+
+CORS_ORIGIN_WHITELIST = [
+    'http://localhost:3000',
+    'http://localhost:3001',
+    'http://localhost:3002',
+]
 
 TEMPLATES = [
     {
@@ -123,3 +132,9 @@ USE_TZ = True
 # https://docs.djangoproject.com/en/3.0/howto/static-files/
 
 STATIC_URL = '/static/'
+
+REST_FRAMEWORK ={
+    'DEFAULT_PERMISSION_CLASSES':[
+        "rest_framework.permissions.IsAuthenticated"
+    ]
+}
