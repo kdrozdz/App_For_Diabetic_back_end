@@ -22,7 +22,7 @@ class PatientDetailsSerializer(serializers.ModelSerializer):
     class Meta:
         model=Patient
         fields=('descript','sugar','avg_sugar')
-        depth=1
+
 
 
 class DoctorSerializer(serializers.ModelSerializer):
