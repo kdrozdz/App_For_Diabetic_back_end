@@ -39,13 +39,9 @@ class Patient(models.Model):
         else:
             return 'Nie ma wyników'
 
-
 class Doctor(models.Model):
     user = models.OneToOneField(User, on_delete=models.CASCADE)
-
-
     def __str__(self):
         return self.descript()
-
     def descript(self):
         return f'Imię: {self.user.username} - Doktor '

@@ -15,11 +15,10 @@ class UsersViewSet(viewsets.ModelViewSet):
     queryset = User.objects.all()
     serializer_class = UserSerializer
     permission_classes = (AllowAny,)
-
     def create(self, request, *args, **kwargs):
         try:
             user = User.objects.create_user(username=request.data['username'],
-                                                   is_staff=request.data['is_staff'],)
+                                            is_staff=request.data['is_staff'],)
             user.set_password(request.data['password'])
             user.save()
             serializer = UserSerializer(user, many=False)
