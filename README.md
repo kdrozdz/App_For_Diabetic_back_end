@@ -10,4 +10,4 @@ He can put sugar level , and he has an insight on his sugar levels.
 
 While you're creating profile you have choice you can select doctor or patient , token will be created automatically
 
-It isn't finished yet. 
+Front isn't finished yet. 
