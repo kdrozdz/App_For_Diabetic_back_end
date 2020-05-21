@@ -25,7 +25,7 @@ SECRET_KEY = 'e7t^^-9%i%ti91d29r)p^^ox=iw@elssh)fxtgw#6($=9p#aiz'
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = True
 
-ALLOWED_HOSTS = []
+ALLOWED_HOSTS = ['*']
 
 
 # Application definition

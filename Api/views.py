@@ -1,21 +1,32 @@
 from django.contrib.auth.models import User
-from django.http import HttpResponse
-from django.shortcuts import render
 from rest_framework import viewsets
 from rest_framework.authentication import TokenAuthentication
 from rest_framework.decorators import action
-from rest_framework.response import Response
 from Api.Serializers import UserSerializer, PatientSerializer ,DoctorSerializer, Sugar_levelSerializer
 from Api.models import Patient ,Doctor, Sugar_level
 from rest_framework.permissions import IsAuthenticated, AllowAny
+from rest_framework.authtoken.views import ObtainAuthToken
+from rest_framework.authtoken.models import Token
+from rest_framework.response import Response
+from rest_framework.authtoken.serializers import AuthTokenSerializer
 
 
+class CustomObtainAuthToken(ObtainAuthToken):
+    serializer_class = AuthTokenSerializer
+    queryset = Token.objects.all()
+    def post(self, request, *args, **kwargs):
+        response = super(CustomObtainAuthToken, self).post(request, *args, **kwargs)
+        token = Token.objects.get(key=response.data['token'])
+        return Response({'token': token.key, 'id':token.user_id})
 
-class UsersViewSet(viewsets.ModelViewSet):
+
+class UsersViewSet ( viewsets.ModelViewSet ) :
     queryset = User.objects.all()
     serializer_class = UserSerializer
     permission_classes = (AllowAny,)
+
     def create(self, request, *args, **kwargs):
+        print(request.data['username'])
         try:
             user = User.objects.create_user(username=request.data['username'],
                                             is_staff=request.data['is_staff'],)
@@ -24,15 +35,13 @@ class UsersViewSet(viewsets.ModelViewSet):
             serializer = UserSerializer(user, many=False)
             return Response(serializer.data)
         except:
-            return Response("Użytkownik juz istnieje")
-
+            return Response("Użytkownik juz istnieje jestem tu ")
 
 class PatientViewSet(viewsets.ModelViewSet):
     queryset = Patient.objects.all()
     serializer_class = PatientSerializer
     permission_classes=(IsAuthenticated,)
     authentication_classes = (TokenAuthentication,)
-
 
     @action(detail=True,methods=['post'])
     def sugar(self,request,**kwargs):
@@ -50,7 +59,6 @@ class DoctorViewSet(viewsets.ModelViewSet):
     permission_classes=(IsAuthenticated,)
     authentication_classes = (TokenAuthentication,)
 
-
     @action(detail=True)
     def add_patient(self,request,**kwargs):
         doctor = self.get_object()
@@ -62,6 +70,7 @@ class DoctorViewSet(viewsets.ModelViewSet):
         return Response(serializer.data)
 
 class Sugar_leveViewSet(viewsets.ModelViewSet):
+
     queryset = Sugar_level.objects.all()
     serializer_class = Sugar_levelSerializer
     permission_classes=(IsAuthenticated,)

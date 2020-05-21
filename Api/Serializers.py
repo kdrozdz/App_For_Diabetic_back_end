@@ -4,6 +4,7 @@ from django.contrib.auth.models import User
 from Api.models import Patient ,Doctor ,Sugar_level
 
 
+
 class UserSerializer(serializers.ModelSerializer):
     class Meta:
         model = User
