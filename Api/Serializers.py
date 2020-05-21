@@ -41,9 +41,10 @@ class DoctorMinSerializer(serializers.ModelSerializer):
 class PatientSerializer(serializers.ModelSerializer):
     doctor = DoctorMinSerializer(many=False)
     sugar = Sugar_levelSerializer(many=True)
+    user = UserSerializer(many=False)
     class Meta:
         model=Patient
-        fields=('descript','id','doctor','sugar','avg_sugar')
+        fields=('user','id','doctor','sugar','avg_sugar')
         depth=1
 
 

@@ -25,6 +25,8 @@ class UsersViewSet ( viewsets.ModelViewSet ) :
     serializer_class = UserSerializer
     permission_classes = (AllowAny,)
 
+
+
     def create(self, request, *args, **kwargs):
         print(request.data['username'])
         try:
@@ -35,13 +37,19 @@ class UsersViewSet ( viewsets.ModelViewSet ) :
             serializer = UserSerializer(user, many=False)
             return Response(serializer.data)
         except:
-            return Response("Użytkownik juz istnieje jestem tu ")
+            return Response("Użytkownik juz istnieje")
 
 class PatientViewSet(viewsets.ModelViewSet):
     queryset = Patient.objects.all()
     serializer_class = PatientSerializer
     permission_classes=(IsAuthenticated,)
     authentication_classes = (TokenAuthentication,)
+
+    def retrieve(self, request, pk=None):
+        instance = Patient.objects.get(user_id=pk)
+        serializer = PatientSerializer(instance)
+        return Response(serializer.data)
+
 
     @action(detail=True,methods=['post'])
     def sugar(self,request,**kwargs):
