@@ -25,8 +25,6 @@ class UsersViewSet ( viewsets.ModelViewSet ) :
     serializer_class = UserSerializer
     permission_classes = (AllowAny,)
 
-
-
     def create(self, request, *args, **kwargs):
         print(request.data['username'])
         try:
@@ -45,7 +43,7 @@ class PatientViewSet(viewsets.ModelViewSet):
     permission_classes=(IsAuthenticated,)
     authentication_classes = (TokenAuthentication,)
 
-    def retrieve(self, request, pk=None):
+    def retrieve(self, request, pk=None, **kwargs):
         instance = Patient.objects.get(user_id=pk)
         serializer = PatientSerializer(instance)
         return Response(serializer.data)
@@ -66,6 +64,11 @@ class DoctorViewSet(viewsets.ModelViewSet):
     serializer_class = DoctorSerializer
     permission_classes=(IsAuthenticated,)
     authentication_classes = (TokenAuthentication,)
+
+    def retrieve(self, request, pk=None,**kwargs):
+        instance = Doctor.objects.get(user_id=pk)
+        serializer = DoctorSerializer(instance)
+        return Response(serializer.data)
 
     @action(detail=True)
     def add_patient(self,request,**kwargs):
