@@ -1,5 +1,5 @@
 from django.contrib.auth.models import User
-from rest_framework import viewsets
+from rest_framework import viewsets, filters
 from rest_framework.authentication import TokenAuthentication
 from rest_framework.decorators import action
 from Api.Serializers import UserSerializer, PatientSerializer ,DoctorSerializer, Sugar_levelSerializer
@@ -50,13 +50,15 @@ class PatientViewSet(viewsets.ModelViewSet):
 
 
     @action(detail=True,methods=['post'])
-    def sugar(self,request,**kwargs):
-        new_sugar = Sugar_level.objects.create(patient=self.get_object(),
+    def sugar(self,request,pk=None,**kwargs):
+        patient = Patient.objects.get(user_id=pk)
+        new_sugar = Sugar_level.objects.create(patient=patient,
                                                level=request.data['level'],
                                                without_a_meal=request.data['without_a_meal'],)
         new_sugar.save()
-        serializer = PatientSerializer(self.get_object(),many=False)
+        serializer = Sugar_levelSerializer(new_sugar,many=False)
         return Response(serializer.data)
+
 
 
 class DoctorViewSet(viewsets.ModelViewSet):
@@ -81,11 +83,17 @@ class DoctorViewSet(viewsets.ModelViewSet):
         return Response(serializer.data)
 
 class Sugar_leveViewSet(viewsets.ModelViewSet):
-
     queryset = Sugar_level.objects.all()
     serializer_class = Sugar_levelSerializer
     permission_classes=(IsAuthenticated,)
     authentication_classes = (TokenAuthentication,)
+
+
+    def list(self, request, *args, **kwargs):
+        sugars = Sugar_level.objects.filter(patient__user=request.query_params.get('pk')).order_by('-date')
+        serializer = Sugar_levelSerializer(sugars,many=True)
+        return Response(serializer.data)
+
 
 
 

@@ -14,8 +14,7 @@ router.register('sugar',Sugar_leveViewSet),
 
 
 
-urlpatterns = [
-    path('',include(router.urls)),
-    url(r'^auth/', CustomObtainAuthToken.as_view())
-    ,
-]
+urlpatterns = (
+    path('', include(router.urls)),
+    url(r'^auth/', CustomObtainAuthToken.as_view()),
+)

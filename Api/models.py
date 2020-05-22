@@ -17,7 +17,7 @@ def create_auth_token(sender,instance=None , created=False,**kwargs):
 
 class Sugar_level(models.Model):
     level = models.IntegerField()
-    data = models.DateTimeField(auto_now=True)
+    date = models.DateTimeField(auto_now=True)
     without_a_meal=models.BooleanField(default=False)
     patient = models.ForeignKey('Patient',on_delete=models.CASCADE  ,related_name='sugar')
 
@@ -35,7 +35,27 @@ class Patient(models.Model):
     def avg_sugar(self):
         all_lvl = [x.level for x in Sugar_level.objects.filter(patient=self)]
         if len(all_lvl) > 0 :
-            return f'Średnia to {round((sum(all_lvl) / len(all_lvl)))}'
+            avg_all = round((sum(all_lvl) / len(all_lvl)))
+            return avg_all
+        else:
+            return 'Nie ma wyników'
+
+    def avg_sugar_10(self):
+        sugar_10 = Sugar_level.objects.filter(patient=1).order_by('-date')[:10]
+        all_lvl=[x.level for x in sugar_10]
+
+        if len(all_lvl) > 0 :
+            avg_10 = round((sum(all_lvl) / len(all_lvl)))
+            return avg_10
+        else:
+            return 'Nie ma wyników'
+
+
+    def avg_no_meal(self):
+        sugar_no_meal = [x.level for x in Sugar_level.objects.filter(without_a_meal=True)]
+        if len(sugar_no_meal) > 0:
+            avg_no_meal = round((sum(sugar_no_meal) / len(sugar_no_meal)))
+            return avg_no_meal
         else:
             return 'Nie ma wyników'
 
