@@ -15,6 +15,7 @@ class Sugar_levelSerializer(serializers.ModelSerializer):
         model=Sugar_level
         exclude = ['patient','id']
 
+
 class PatientDetailsSerializer(serializers.ModelSerializer):
     sugar = Sugar_levelSerializer(many=True)
     class Meta:
@@ -34,12 +35,15 @@ class DoctorMinSerializer(serializers.ModelSerializer):
         model = Doctor
         fields = ('descript','id')
 
+
 class PatientSerializer(serializers.ModelSerializer):
     doctor = DoctorMinSerializer(many=False)
     user = UserSerializer(many=False)
+    all_sugar = Sugar_levelSerializer(many=True)
     class Meta:
         model=Patient
-        fields=('user','id','doctor','avg_sugar','avg_sugar_10',"avg_no_meal")
+        fields=('user','id','doctor','avg_sugar','avg_sugar_10',"avg_no_meal",'all_sugar')
         depth=1
+
 
 

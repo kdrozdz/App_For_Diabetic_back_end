@@ -5,6 +5,7 @@ from django.db.models.signals import post_save
 from django.dispatch import receiver
 
 
+
 @receiver(post_save ,sender=User)
 def create_auth_token(sender,instance=None , created=False,**kwargs):
     if created:
@@ -22,6 +23,7 @@ class Sugar_level(models.Model):
     patient = models.ForeignKey('Patient',on_delete=models.CASCADE  ,related_name='sugar')
 
 
+
 class Patient(models.Model):
     user = models.OneToOneField(User , on_delete=models.CASCADE)
     doctor = models.ForeignKey('Doctor',on_delete=models.CASCADE,blank=True,null=True ,related_name='patient')
@@ -32,6 +34,12 @@ class Patient(models.Model):
     def descript(self):
         return f'{self.user.username} Patient'
 
+    def all_sugar(self):
+        all_sugar = [x for x in Sugar_level.objects.filter(patient=self)]
+        if len(all_sugar) > 0:
+            return all_sugar
+        return 'Nie ma wyników'
+
     def avg_sugar(self):
         all_lvl = [x.level for x in Sugar_level.objects.filter(patient=self)]
         if len(all_lvl) > 0 :
@@ -41,7 +49,7 @@ class Patient(models.Model):
             return 'Nie ma wyników'
 
     def avg_sugar_10(self):
-        sugar_10 = Sugar_level.objects.filter(patient=1).order_by('-date')[:10]
+        sugar_10 = Sugar_level.objects.filter(patient=self).order_by('-date')[:10]
         all_lvl=[x.level for x in sugar_10]
 
         if len(all_lvl) > 0 :
@@ -52,7 +60,7 @@ class Patient(models.Model):
 
 
     def avg_no_meal(self):
-        sugar_no_meal = [x.level for x in Sugar_level.objects.filter(without_a_meal=True)]
+        sugar_no_meal = [x.level for x in Sugar_level.objects.filter(patient=self).filter(without_a_meal=True)]
         if len(sugar_no_meal) > 0:
             avg_no_meal = round((sum(sugar_no_meal) / len(sugar_no_meal)))
             return avg_no_meal
