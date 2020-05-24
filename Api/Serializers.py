@@ -17,10 +17,10 @@ class Sugar_levelSerializer(serializers.ModelSerializer):
 
 
 class PatientDetailsSerializer(serializers.ModelSerializer):
-    sugar = Sugar_levelSerializer(many=True)
+    user = UserSerializer(many=False)
     class Meta:
         model=Patient
-        fields=('descript','sugar','avg_sugar')
+        fields=('id','user')
 
 
 class DoctorSerializer(serializers.ModelSerializer):

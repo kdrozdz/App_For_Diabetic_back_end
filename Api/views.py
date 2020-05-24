@@ -2,7 +2,7 @@ from django.contrib.auth.models import User
 from rest_framework import viewsets, filters
 from rest_framework.authentication import TokenAuthentication
 from rest_framework.decorators import action
-from Api.Serializers import UserSerializer, PatientSerializer ,DoctorSerializer, Sugar_levelSerializer
+from Api.Serializers import UserSerializer, PatientSerializer ,DoctorSerializer, Sugar_levelSerializer ,PatientDetailsSerializer
 from Api.models import Patient ,Doctor, Sugar_level
 from rest_framework.permissions import IsAuthenticated, AllowAny
 from rest_framework.authtoken.views import ObtainAuthToken
@@ -26,7 +26,6 @@ class UsersViewSet ( viewsets.ModelViewSet ) :
     permission_classes = (AllowAny,)
 
     def create(self, request, *args, **kwargs):
-        print(request.data['username'])
         try:
             user = User.objects.create_user(username=request.data['username'],
                                             is_staff=request.data['is_staff'],)
@@ -60,6 +59,12 @@ class PatientViewSet(viewsets.ModelViewSet):
         return Response(serializer.data)
 
 
+    def list(self, request, *args, **kwargs):
+        pateint = Patient.objects.filter(doctor=None)
+        serializer = PatientDetailsSerializer(pateint , many=True)
+        return  Response(serializer.data)
+
+
 
 class DoctorViewSet(viewsets.ModelViewSet):
     queryset = Doctor.objects.all()
@@ -72,15 +77,27 @@ class DoctorViewSet(viewsets.ModelViewSet):
         serializer = DoctorSerializer(instance)
         return Response(serializer.data)
 
-    @action(detail=True)
-    def add_patient(self,request,**kwargs):
-        doctor = self.get_object()
-        patients= Patient.objects.get(pk=request.data['patient_pk'])
+    @action(detail=True , methods=['post'])
+    def add_patient(self,request,pk=None,**kwargs):
+        doctor = Doctor.objects.get(user_id=pk)
+        patients= Patient.objects.get(user_id=request.data['patient_pk'])
         patients.doctor = doctor
         patients.save()
+        serializer = PatientDetailsSerializer(patients)
+        return  Response(serializer.data)
 
-        serializer = PatientSerializer(patients,many=True)
+    @action(detail=True)
+    def my_patients(self,request, *args ,pk=None , **kwargs):
+        patients = Patient.objects.filter(doctor__user=pk)
+        serializer = PatientDetailsSerializer(patients,many=True)
         return Response(serializer.data)
+
+    @action(detail=False , methods=['post'])
+    def rm_patient(self,request,*args,**kwargs):
+        patient = Patient.objects.get(user=request.data.get('userId'))
+        patient.doctor = None
+        patient.save()
+        return Response(None)
 
 class Sugar_leveViewSet(viewsets.ModelViewSet):
     queryset = Sugar_level.objects.all()

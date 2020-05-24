@@ -38,7 +38,7 @@ class Patient(models.Model):
         all_sugar = [x for x in Sugar_level.objects.filter(patient=self)]
         if len(all_sugar) > 0:
             return all_sugar
-        return 'Nie ma wyników'
+
 
     def avg_sugar(self):
         all_lvl = [x.level for x in Sugar_level.objects.filter(patient=self)]
