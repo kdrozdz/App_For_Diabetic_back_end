@@ -73,3 +73,10 @@ class Doctor(models.Model):
         return self.descript()
     def descript(self):
         return f'Imię: {self.user.username} - Doktor '
+
+class Email(models.Model):
+    sender = models.ForeignKey(User,related_name='user_send', on_delete=models.DO_NOTHING)
+    reciver = models.ForeignKey(User,related_name='user_recived', on_delete=models.DO_NOTHING)
+    is_new = models.BooleanField(default=True)
+    create_time =models.DateTimeField(auto_now=True)
+    msg= models.TextField()

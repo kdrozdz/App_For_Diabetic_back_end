@@ -1,7 +1,6 @@
 from rest_framework import serializers
 from django.contrib.auth.models import User
-from Api.models import Patient ,Doctor ,Sugar_level
-
+from Api.models import Patient, Doctor, Sugar_level, Email
 
 
 class UserSerializer(serializers.ModelSerializer):
@@ -31,9 +30,10 @@ class DoctorSerializer(serializers.ModelSerializer):
 
 
 class DoctorMinSerializer(serializers.ModelSerializer):
+    user = UserSerializer(many=False)
     class Meta:
         model = Doctor
-        fields = ('descript','id')
+        fields = ('descript','id','user')
 
 
 class PatientSerializer(serializers.ModelSerializer):
@@ -46,4 +46,7 @@ class PatientSerializer(serializers.ModelSerializer):
         depth=1
 
 
-
+class EmailSerializer(serializers.ModelSerializer):
+    class Meta:
+        model=Email
+        fields= '__all__'

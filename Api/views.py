@@ -2,8 +2,8 @@ from django.contrib.auth.models import User
 from rest_framework import viewsets, filters
 from rest_framework.authentication import TokenAuthentication
 from rest_framework.decorators import action
-from Api.Serializers import UserSerializer, PatientSerializer ,DoctorSerializer, Sugar_levelSerializer ,PatientDetailsSerializer
-from Api.models import Patient ,Doctor, Sugar_level
+from Api.Serializers import UserSerializer, PatientSerializer ,DoctorSerializer, Sugar_levelSerializer ,PatientDetailsSerializer ,EmailSerializer
+from Api.models import Patient ,Doctor, Sugar_level , Email
 from rest_framework.permissions import IsAuthenticated, AllowAny
 from rest_framework.authtoken.views import ObtainAuthToken
 from rest_framework.authtoken.models import Token
@@ -105,13 +105,22 @@ class Sugar_leveViewSet(viewsets.ModelViewSet):
     permission_classes=(IsAuthenticated,)
     authentication_classes = (TokenAuthentication,)
 
-
     def list(self, request, *args, **kwargs):
         sugars = Sugar_level.objects.filter(patient__user=request.query_params.get('pk')).order_by('-date')
         serializer = Sugar_levelSerializer(sugars,many=True)
         return Response(serializer.data)
 
+class EmailViewSet(viewsets.ModelViewSet):
+    queryset = Email.objects.all()
+    serializer_class = EmailSerializer
+    permission_classes = (IsAuthenticated,)
+    authentication_classes = (TokenAuthentication,)
 
+    @action(detail=False ,methods=['post'])
+    def conv(self,request, *args,**kwargs):
+        iSend = Email.objects.filter(sender=request.data['sId']).filter(reciver=request.data.get('rId')).order_by('-create_time')
+        serializer = EmailSerializer(iSend,many=True)
+        return Response(serializer.data)
 
 
 
