@@ -118,8 +118,14 @@ class EmailViewSet(viewsets.ModelViewSet):
 
     @action(detail=False ,methods=['post'])
     def conv(self,request, *args,**kwargs):
-        iSend = Email.objects.filter(sender=request.data['sId']).filter(reciver=request.data.get('rId')).order_by('-create_time')
-        serializer = EmailSerializer(iSend,many=True)
+        rec= request.data['rId']
+        send=request.data['sId']
+        print(rec , send)
+        msg = [ x for x in Email.objects.all().order_by('-create_time')
+                if x.sender.id == int(send) and x.reciver.id == int(rec)
+                or x.sender.id == int(rec) and x.reciver.id == int(send)]
+        serializer = EmailSerializer(msg,many=True)
+        print(msg)
         return Response(serializer.data)
 
 
