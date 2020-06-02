@@ -48,7 +48,7 @@ class PatientViewSet(viewsets.ModelViewSet):
             serializer = PatientSerializer(instance)
             return Response(serializer.data)
         except:
-            return Response("a")
+            return Response("")
 
     @action(detail=True,methods=['post'])
     def sugar(self,request,pk=None,**kwargs):
