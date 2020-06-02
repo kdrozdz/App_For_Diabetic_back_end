@@ -116,20 +116,29 @@ class EmailViewSet(viewsets.ModelViewSet):
     permission_classes = (IsAuthenticated,)
     authentication_classes = (TokenAuthentication,)
 
+
+    def update(self, request, *args, **kwargs):
+        msg=self.get_object()
+        msg.is_new=request.data.get('is_new')
+        msg.save()
+        return Response("ok")
+
+
     @action(detail=False ,methods=['post'])
     def conv(self,request, *args,**kwargs):
         rec= request.data['rId']
         send=request.data['sId']
-        print(rec , send)
         msg = [ x for x in Email.objects.all().order_by('-create_time')
                 if x.sender.id == int(send) and x.reciver.id == int(rec)
                 or x.sender.id == int(rec) and x.reciver.id == int(send)]
         serializer = EmailSerializer(msg,many=True)
-        print(msg)
         return Response(serializer.data)
 
-
-
+    @action(detail=False,methods=['post'])
+    def new_msg(self,request,*args,**kwargs):
+        msg = Email.objects.filter(reciver=request.data['rId']).filter(is_new=True)
+        serializer = EmailSerializer(msg, many=True)
+        return Response(serializer.data)
 
 
 
