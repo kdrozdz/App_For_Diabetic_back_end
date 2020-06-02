@@ -43,10 +43,12 @@ class PatientViewSet(viewsets.ModelViewSet):
     authentication_classes = (TokenAuthentication,)
 
     def retrieve(self, request, pk=None, **kwargs):
-        instance = Patient.objects.get(user_id=pk)
-        serializer = PatientSerializer(instance)
-        return Response(serializer.data)
-
+        try:
+            instance = Patient.objects.get(user_id=pk)
+            serializer = PatientSerializer(instance)
+            return Response(serializer.data)
+        except:
+            return Response("a")
 
     @action(detail=True,methods=['post'])
     def sugar(self,request,pk=None,**kwargs):
