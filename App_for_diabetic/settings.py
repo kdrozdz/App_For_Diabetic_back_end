@@ -25,7 +25,7 @@ SECRET_KEY = os.environ.get('SECRET_KEY_2')
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = False
 
-ALLOWED_HOSTS = ['*']
+ALLOWED_HOSTS = ['app-diabetic.herokuapp.com']
 
 
 # Application definition
@@ -59,7 +59,7 @@ ROOT_URLCONF = 'App_for_diabetic.urls'
 
 CORS_ORIGIN_WHITELIST = [
     'http://localhost:3000',
-    'https://app-for-diabetic.herokuapp.com/',
+    'https://app-for-diabetic-react-kd.herokuapp.com/',
 
 ]
 
