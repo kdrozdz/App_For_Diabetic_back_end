@@ -12,3 +12,5 @@ While you're creating profile you have choice you can select doctor or patient ,
 
 Front React : Heroku: https://app-for-diabetic-react-kd.herokuapp.com/
 Git: https://github.com/kdrozdz/-App_For_Diabetic_front_end
+
+I used : django-rest-framework , django-filter , django-cors-headers

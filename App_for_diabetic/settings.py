@@ -60,7 +60,7 @@ ROOT_URLCONF = 'App_for_diabetic.urls'
 
 CORS_ORIGIN_WHITELIST = [
     'http://localhost:3000',
-    'https://app-for-diabetic-react-kd.herokuapp.com',
+    'https://app-for-diabetic-react.herokuapp.com',
 
 ]
 
