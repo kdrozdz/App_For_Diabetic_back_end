@@ -10,7 +10,8 @@ Patient : He can put sugar level , and he has an insight on his sugar levels. ca
 
 While you're creating profile you have choice you can select doctor or patient , token will be created automatically
 
-Front React : Heroku: https://app-for-diabetic-react-kd.herokuapp.com/
+Front React : 
+Heroku: https://app-for-diabetic-react.herokuapp.com/
 Git: https://github.com/kdrozdz/-App_For_Diabetic_front_end
 
 I used : django-rest-framework , django-filter , django-cors-headers
