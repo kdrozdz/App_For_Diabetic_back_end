@@ -1,8 +1,8 @@
 from accounts.models import Account
-from rest_framework import viewsets
+from rest_framework import viewsets, status
 from rest_framework.authentication import TokenAuthentication
 from rest_framework.decorators import action
-from Api.Serializers import AccountSerializer
+from Api.Serializers import AccountCreateSerializer, AccountGetSerializer
 from Api.models import Patient, Doctor, Sugar_level, Email
 from rest_framework.permissions import IsAuthenticated, AllowAny
 from rest_framework.authtoken.views import ObtainAuthToken
@@ -23,9 +23,9 @@ class CustomObtainAuthToken(ObtainAuthToken):
 
 class AccountViewSet (viewsets.ModelViewSet):
     queryset = Account.objects.all()
-    serializer_class = AccountSerializer
     authentication_classes = (TokenAuthentication, )
     permission_classes = (AllowAny, )
+    serializer_class = AccountGetSerializer
 
     def get_permissions(self):
         if self.action in ('create', ):
@@ -34,26 +34,16 @@ class AccountViewSet (viewsets.ModelViewSet):
             self.permission_classes = (IsAuthenticated,)
         return super(self.__class__, self).get_permissions()
 
+
     def create(self, request, *args, **kwargs):
         if(Account.objects.filter(email=request.data['email']).exists()):
             return Response("This email address is already being used")
 
-        for value in ['email', 'first_name', 'last_name', 'profile', 'age', 'phone_number']:
-            if value not in request.data.keys() or request.data[value] == False:
-                return Response({f'error: {value} is required.'})
-
-        account = Account.objects.create_user(
-            email=request.data['email'],
-            first_name=request.data['first_name'],
-            last_name=request.data['last_name'],
-            profile=request.data['profile'],
-            age=request.data['age'],
-            phone_number=request.data['phone_number'],
-        )
-        account.set_password(request.data['password'])
-        account.save()
-        serializer = AccountSerializer(account, many=False)
-        return Response(serializer.data)
+        serializer = AccountCreateSerializer(data=request.data)
+        if serializer.is_valid():
+            serializer.save()
+            return Response(serializer.data['email'], status=status.HTTP_201_CREATED)
+        return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
 
 # class PatientViewSet(viewsets.ModelViewSet):

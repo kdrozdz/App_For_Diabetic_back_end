@@ -3,21 +3,31 @@ from accounts.models import Account
 from Api.models import Patient, Doctor, Sugar_level, Email
 
 
-class AccountSerializer(serializers.ModelSerializer):
-    profile = serializers.CharField(source='get_profile_display')
 
+class AccountCreateSerializer(serializers.ModelSerializer):
     class Meta:
         model = Account
-        profile = serializers.CharField(source='get_profile_display')
-
         fields = ['email', 'first_name', 'last_name', 'age', 'phone_number', 'password', 'profile']
         extra_kwargs = {'password': {'write_only': True, 'required': True}}
 
 
-class SugarLevelSerializer(serializers.ModelSerializer):
-    class Meta:
-        model = Sugar_level
-        exclude = ['patient', 'id']
+class AccountGetSerializer(AccountCreateSerializer):
+    profile_display = serializers.CharField(source='get_profile_display')
+
+    class Meta(AccountCreateSerializer.Meta):
+        fields =[]
+
+        for field in AccountCreateSerializer.Meta.fields:
+            if field == 'profile':
+                fields.append('profile_display')
+            elif field not in ['profile', 'password']:
+                fields.append(field)
+
+
+# class SugarLevelSerializer(serializers.ModelSerializer):
+#     class Meta:
+#         model = Sugar_level
+#         exclude = ['patient', 'id']
 
 
 # class PatientDetailsSerializer(serializers.ModelSerializer):
