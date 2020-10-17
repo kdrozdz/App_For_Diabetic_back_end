@@ -1,20 +1,25 @@
-# from rest_framework import serializers
-# from django.contrib.auth.models import User
-# from Api.models import Patient, Doctor, Sugar_level, Email
-#
-#
-# class UserSerializer(serializers.ModelSerializer):
-#     class Meta:
-#         model = User
-#         fields = ("id", 'username', 'password', 'is_staff')
-#         extra_kwargs = {'password': {'write_only': True, 'required': True}}
-#
-# class SugarLevelSerializer(serializers.ModelSerializer):
-#     class Meta:
-#         model = Sugar_level
-#         exclude = ['patient', 'id']
-#
-#
+from rest_framework import serializers
+from accounts.models import Account
+from Api.models import Patient, Doctor, Sugar_level, Email
+
+
+class AccountSerializer(serializers.ModelSerializer):
+    profile = serializers.CharField(source='get_profile_display')
+
+    class Meta:
+        model = Account
+        profile = serializers.CharField(source='get_profile_display')
+
+        fields = ['email', 'first_name', 'last_name', 'age', 'phone_number', 'password', 'profile']
+        extra_kwargs = {'password': {'write_only': True, 'required': True}}
+
+
+class SugarLevelSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = Sugar_level
+        exclude = ['patient', 'id']
+
+
 # class PatientDetailsSerializer(serializers.ModelSerializer):
 #     user = UserSerializer(many=False)
 #

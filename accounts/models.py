@@ -48,20 +48,20 @@ class Account(AbstractBaseUser):
 	is_active = models.BooleanField(default=True)
 	is_staff = models.BooleanField(default=False)
 	is_superuser = models.BooleanField(default=False)
-
 	last_name = models.CharField(max_length=32)
 	first_name = models.CharField(max_length=32)
 	age = models.IntegerField(validators=[MinValueValidator(1), MaxValueValidator(120)])
 	profile = models.IntegerField(choices=((1, 'Doctor'), (2, 'Patient')))
-	phone_number = models.IntegerField(null=True)
+	phone_number = models.IntegerField()
 
 	USERNAME_FIELD = 'email'
-	REQUIRED_FIELDS = ['last_name', 'first_name', 'profile', 'age']
+	REQUIRED_FIELDS = ['last_name', 'first_name', 'profile', 'age', 'phone_number']
 
 	objects = MyAccountManager()
+	readonly_fields = ('id',)
 
 	def __str__(self):
-		return self.email
+		return self.get_profile_display()
 
 	# For checking permissions. to keep it simple all admin have ALL permissons
 	def has_perm(self, perm, obj=None):

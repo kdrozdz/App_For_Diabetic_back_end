@@ -1,43 +1,61 @@
-# from django.contrib.auth.models import User
-# from rest_framework import viewsets
-# from rest_framework.authentication import TokenAuthentication
-# from rest_framework.decorators import action
-# from Api.Serializers import UserSerializer, PatientSerializer, DoctorSerializer, SugarLevelSerializer, PatientDetailsSerializer, EmailSerializer
-# from Api.models import Patient, Doctor, Sugar_level, Email
-# from rest_framework.permissions import IsAuthenticated, AllowAny
-# from rest_framework.authtoken.views import ObtainAuthToken
-# from rest_framework.authtoken.models import Token
-# from rest_framework.response import Response
-# from rest_framework.authtoken.serializers import AuthTokenSerializer
-#
-#
-# class CustomObtainAuthToken(ObtainAuthToken):
-#     serializer_class = AuthTokenSerializer
-#     queryset = Token.objects.all()
-#
-#     def post(self, request, *args, **kwargs):
-#         response = super(CustomObtainAuthToken, self).post(request, *args, **kwargs)
-#         token = Token.objects.get(key=response.data['token'])
-#         return Response({'token': token.key, 'id': token.user_id})
-#
-#
-# class UsersViewSet (viewsets.ModelViewSet):
-#     queryset = User.objects.all()
-#     serializer_class = UserSerializer
-#     permission_classes = (AllowAny,)
-#
-#     def create(self, request, *args, **kwargs):
-#         try:
-#             user = User.objects.create_user(username=request.data['username'],
-#                                             is_staff=request.data['is_staff'],)
-#             user.set_password(request.data['password'])
-#             user.save()
-#             serializer = UserSerializer(user, many=False)
-#             return Response(serializer.data)
-#         except:
-#             return Response("Użytkownik juz istnieje")
-#
-#
+from accounts.models import Account
+from rest_framework import viewsets
+from rest_framework.authentication import TokenAuthentication
+from rest_framework.decorators import action
+from Api.Serializers import AccountSerializer
+from Api.models import Patient, Doctor, Sugar_level, Email
+from rest_framework.permissions import IsAuthenticated, AllowAny
+from rest_framework.authtoken.views import ObtainAuthToken
+from rest_framework.authtoken.models import Token
+from rest_framework.response import Response
+from rest_framework.authtoken.serializers import AuthTokenSerializer
+
+
+class CustomObtainAuthToken(ObtainAuthToken):
+    serializer_class = AuthTokenSerializer
+    queryset = Token.objects.all()
+
+    def post(self, request, *args, **kwargs):
+        response = super(CustomObtainAuthToken, self).post(request, *args, **kwargs)
+        token = Token.objects.get(key=response.data['token'])
+        return Response({'token': token.key, 'id': token.user_id})
+
+
+class AccountViewSet (viewsets.ModelViewSet):
+    queryset = Account.objects.all()
+    serializer_class = AccountSerializer
+    authentication_classes = (TokenAuthentication, )
+    permission_classes = (AllowAny, )
+
+    def get_permissions(self):
+        if self.action in ('create', ):
+            self.permission_classes = (AllowAny,)
+        else:
+            self.permission_classes = (IsAuthenticated,)
+        return super(self.__class__, self).get_permissions()
+
+    def create(self, request, *args, **kwargs):
+        if(Account.objects.filter(email=request.data['email']).exists()):
+            return Response("This email address is already being used")
+
+        for value in ['email', 'first_name', 'last_name', 'profile', 'age', 'phone_number']:
+            if value not in request.data.keys() or request.data[value] == False:
+                return Response({f'error: {value} is required.'})
+
+        account = Account.objects.create_user(
+            email=request.data['email'],
+            first_name=request.data['first_name'],
+            last_name=request.data['last_name'],
+            profile=request.data['profile'],
+            age=request.data['age'],
+            phone_number=request.data['phone_number'],
+        )
+        account.set_password(request.data['password'])
+        account.save()
+        serializer = AccountSerializer(account, many=False)
+        return Response(serializer.data)
+
+
 # class PatientViewSet(viewsets.ModelViewSet):
 #     queryset = Patient.objects.all()
 #     serializer_class = PatientSerializer
@@ -45,28 +63,28 @@
 #     authentication_classes = (TokenAuthentication, )
 #
 #
-#     # def all_sugar(self):
-#     #     all_sugar = [x for x in Sugar_level.objects.filter(patient=self)]
-#     #     if len(all_sugar) > 0:
-#     #         return all_sugar
-#     #
-#     # def avg_sugar(self):
-#     #     all_lvl = [x.level for x in Sugar_level.objects.filter(patient=self)]
-#     #     if len(all_lvl) > 0:
-#     #         avg_all = round((sum(all_lvl) / len(all_lvl)))
-#     #         return avg_all
-#     #     else:
-#     #         return 'Nie ma wyników'
-#     #
-#     # def avg_sugar_10(self):
-#     #     sugar_10 = Sugar_level.objects.filter(patient=self).order_by('-date')[:10]
-#     #     all_lvl = [x.level for x in sugar_10]
-#     #
-#     #     if len(all_lvl) > 0:
-#     #         avg_10 = round((sum(all_lvl) / len(all_lvl)))
-#     #         return avg_10
-#     #     else:
-#     #         return 'Nie ma wyników'
+#     def all_sugar(self):
+#         all_sugar = [x for x in Sugar_level.objects.filter(patient=self)]
+#         if len(all_sugar) > 0:
+#             return all_sugar
+#
+#     def avg_sugar(self):
+#         all_lvl = [x.level for x in Sugar_level.objects.filter(patient=self)]
+#         if len(all_lvl) > 0:
+#             avg_all = round((sum(all_lvl) / len(all_lvl)))
+#             return avg_all
+#         else:
+#             return 'Nie ma wyników'
+#
+#     def avg_sugar_10(self):
+#         sugar_10 = Sugar_level.objects.filter(patient=self).order_by('-date')[:10]
+#         all_lvl = [x.level for x in sugar_10]
+#
+#         if len(all_lvl) > 0:
+#             avg_10 = round((sum(all_lvl) / len(all_lvl)))
+#             return avg_10
+#         else:
+#             return 'Nie ma wyników'
 #
 #     def retrieve(self, request, pk=None, **kwargs):
 #         try:
