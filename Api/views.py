@@ -41,7 +41,18 @@ class AccountViewSet (viewsets.ModelViewSet):
 
         serializer = AccountCreateSerializer(data=request.data)
         if serializer.is_valid():
-            serializer.save()
+
+            account = Account.objects.create_user(
+                last_name=request.data['last_name'],
+                first_name=request.data['first_name'],
+                email=request.data['email'],
+                age=request.data['age'],
+                profile=request.data['profile'],
+                phone_number=request.data['phone_number'],
+            )
+
+            account.set_password(request.data['password'])
+            account.save()
             return Response(serializer.data['email'], status=status.HTTP_201_CREATED)
         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 

@@ -24,18 +24,13 @@ class AccountGetSerializer(AccountCreateSerializer):
                 fields.append(field)
 
 
-# class SugarLevelSerializer(serializers.ModelSerializer):
-#     class Meta:
-#         model = Sugar_level
-#         exclude = ['patient', 'id']
 
+class PatientDetailsSerializer(serializers.ModelSerializer):
+    user = AccountGetSerializer(many=False)
 
-# class PatientDetailsSerializer(serializers.ModelSerializer):
-#     user = UserSerializer(many=False)
-#
-#     class Meta:
-#         model = Patient
-#         fields = ('id', 'user')
+    class Meta:
+        model = Patient
+        fields = ('user')
 #
 #
 # class DoctorSerializer(serializers.ModelSerializer):
@@ -69,3 +64,8 @@ class AccountGetSerializer(AccountCreateSerializer):
 #     class Meta:
 #         model = Email
 #         fields = '__all__'
+
+# class SugarLevelSerializer(serializers.ModelSerializer):
+#     class Meta:
+#         model = Sugar_level
+#         exclude = ['patient', 'id']

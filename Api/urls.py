@@ -1,6 +1,6 @@
 from django.urls import path
 from rest_framework import routers
-from Api.views import AccountViewSet
+from Api.views import AccountViewSet, CustomObtainAuthToken
 from django.conf.urls import include
 from django.conf.urls import url
 
@@ -17,5 +17,4 @@ router.register('accounts', AccountViewSet),
 
 urlpatterns = (
     path('', include(router.urls)),
-    # url(r'^auth/', CustomObtainAuthToken.as_view()),
 )
