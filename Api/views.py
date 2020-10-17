@@ -1,8 +1,10 @@
+from rest_framework.generics import get_object_or_404
+
 from accounts.models import Account
 from rest_framework import viewsets, status
 from rest_framework.authentication import TokenAuthentication
 from rest_framework.decorators import action
-from Api.Serializers import AccountCreateSerializer, AccountGetSerializer
+from Api.Serializers import AccountCreateSerializer, AccountGetSerializer, PatientSerializer
 from Api.models import Patient, Doctor, Sugar_level, Email
 from rest_framework.permissions import IsAuthenticated, AllowAny
 from rest_framework.authtoken.views import ObtainAuthToken
@@ -18,7 +20,7 @@ class CustomObtainAuthToken(ObtainAuthToken):
     def post(self, request, *args, **kwargs):
         response = super(CustomObtainAuthToken, self).post(request, *args, **kwargs)
         token = Token.objects.get(key=response.data['token'])
-        return Response({'token': token.key, 'id': token.user_id})
+        return Response({'token': token.key, 'id': token.user_id, 'profile':token.user.get_profile_display()})
 
 
 class AccountViewSet (viewsets.ModelViewSet):
@@ -53,60 +55,75 @@ class AccountViewSet (viewsets.ModelViewSet):
 
             account.set_password(request.data['password'])
             account.save()
+            Token.objects.create(user=account)
+
+            if account.profile == '1':
+                doctor = Doctor.objects.create(account=account)
+                doctor.save()
+            elif account.profile == '2':
+                patient = Patient.objects.create(account=account)
+                patient.save()
+
             return Response(serializer.data['email'], status=status.HTTP_201_CREATED)
         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
 
-# class PatientViewSet(viewsets.ModelViewSet):
-#     queryset = Patient.objects.all()
-#     serializer_class = PatientSerializer
-#     permission_classes = (IsAuthenticated, )
-#     authentication_classes = (TokenAuthentication, )
-#
-#
-#     def all_sugar(self):
-#         all_sugar = [x for x in Sugar_level.objects.filter(patient=self)]
-#         if len(all_sugar) > 0:
-#             return all_sugar
-#
-#     def avg_sugar(self):
-#         all_lvl = [x.level for x in Sugar_level.objects.filter(patient=self)]
-#         if len(all_lvl) > 0:
-#             avg_all = round((sum(all_lvl) / len(all_lvl)))
-#             return avg_all
-#         else:
-#             return 'Nie ma wyników'
-#
-#     def avg_sugar_10(self):
-#         sugar_10 = Sugar_level.objects.filter(patient=self).order_by('-date')[:10]
-#         all_lvl = [x.level for x in sugar_10]
-#
-#         if len(all_lvl) > 0:
-#             avg_10 = round((sum(all_lvl) / len(all_lvl)))
-#             return avg_10
-#         else:
-#             return 'Nie ma wyników'
-#
-#     def retrieve(self, request, pk=None, **kwargs):
-#         try:
-#             serializer = PatientSerializer(Patient.objects.get(user_id=pk))
-#             return Response(serializer.data)
-#         except:
-#             return Response("")
-#
-#     @action(detail=True, methods=['post'])
-#     def sugar(self, request, pk=None, **kwargs):
-#         patient = Patient.objects.get(user_id=pk)
-#         new_sugar = Sugar_level.objects.create(patient=patient,
-#                                                level=request.data['level'],
-#                                                without_a_meal=request.data['without_a_meal'])
-#         serializer = SugarLevelSerializer(new_sugar.save(), many=False)
-#         return Response(serializer.data)
-#
-#     def list(self, request, *args, **kwargs):
-#         pateint = Patient.objects.filter(doctor=None)
-#         serializer = PatientDetailsSerializer(pateint, many=True)
-#         return Response(serializer.data)
+class PatientViewSet(viewsets.ModelViewSet):
+    queryset = Patient.objects.all()
+    serializer_class = PatientSerializer
+    permission_classes = (IsAuthenticated, )
+    authentication_classes = (TokenAuthentication, )
+
+
+    def retrieve(self, request, pk=None, **kwargs):
+        patient = Patient.objects.get(account_id=pk)
+        serializer = PatientSerializer(patient)
+        import pdb;pdb.set_trace()
+        return Response(serializer.data)
+
+    # def all_sugar(self):
+    #     all_sugar = [x for x in Sugar_level.objects.filter(patient=self)]
+    #     if len(all_sugar) > 0:
+    #         return all_sugar
+    #
+    # def avg_sugar(self):
+    #     all_lvl = [x.level for x in Sugar_level.objects.filter(patient=self)]
+    #     if len(all_lvl) > 0:
+    #         avg_all = round((sum(all_lvl) / len(all_lvl)))
+    #         return avg_all
+    #     else:
+    #         return 'Nie ma wyników'
+    #
+    # def avg_sugar_10(self):
+    #     sugar_10 = Sugar_level.objects.filter(patient=self).order_by('-date')[:10]
+    #     all_lvl = [x.level for x in sugar_10]
+    #
+    #     if len(all_lvl) > 0:
+    #         avg_10 = round((sum(all_lvl) / len(all_lvl)))
+    #         return avg_10
+    #     else:
+    #         return 'Nie ma wyników'
+    #
+    # def retrieve(self, request, pk=None, **kwargs):
+    #     try:
+    #         serializer = PatientSerializer(Patient.objects.get(user_id=pk))
+    #         return Response(serializer.data)
+    #     except:
+    #         return Response("")
+    #
+    # @action(detail=True, methods=['post'])
+    # def sugar(self, request, pk=None, **kwargs):
+    #     patient = Patient.objects.get(user_id=pk)
+    #     new_sugar = Sugar_level.objects.create(patient=patient,
+    #                                            level=request.data['level'],
+    #                                            without_a_meal=request.data['without_a_meal'])
+    #     serializer = SugarLevelSerializer(new_sugar.save(), many=False)
+    #     return Response(serializer.data)
+    #
+    # def list(self, request, *args, **kwargs):
+    #     pateint = Patient.objects.filter(doctor=None)
+    #     serializer = PatientDetailsSerializer(pateint, many=True)
+    #     return Response(serializer.data)
 #
 #
 # class DoctorViewSet(viewsets.ModelViewSet):

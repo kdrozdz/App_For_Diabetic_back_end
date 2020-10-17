@@ -13,18 +13,18 @@ class Sugar_level(models.Model):
 
 
 class Patient(models.Model):
-    user = models.OneToOneField(Account, on_delete=models.CASCADE)
+    account = models.OneToOneField(Account, on_delete=models.CASCADE, related_name='patient')
     doctor = models.ForeignKey('Doctor', on_delete=models.CASCADE, null=True, related_name='patient')
 
     def __str__(self):
-        return f'{self.user.email} {self.user}'
+        return f'{self.account.email} {self.account}'
 
 
 class Doctor(models.Model):
-    user = models.OneToOneField(Account, on_delete=models.CASCADE)
+    account = models.OneToOneField(Account, on_delete=models.CASCADE)
 
     def __str__(self):
-        return f' {self.user.email} {self.user} '
+        return f' {self.account.email} {self.account} '
 
 
 class Cooperate(models.Model):
@@ -39,13 +39,3 @@ class Email(models.Model):
     is_new = models.BooleanField(default=True)
     create_time = models.DateTimeField(auto_now_add=True)
     msg = models.TextField()
-
-
-@receiver(post_save, sender=Account)
-def create_auth_token(sender, instance=None, created=False, **kwargs):
-    if created:
-        Token.objects.create(user=instance)
-        if instance.profile == 1:
-            Doctor.objects.create(user=instance)
-        else:
-            Patient.objects.create(user=instance)

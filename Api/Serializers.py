@@ -7,7 +7,7 @@ from Api.models import Patient, Doctor, Sugar_level, Email
 class AccountCreateSerializer(serializers.ModelSerializer):
     class Meta:
         model = Account
-        fields = ['email', 'first_name', 'last_name', 'age', 'phone_number', 'password', 'profile']
+        fields = ['email', 'first_name', 'last_name', 'age', 'phone_number', 'password', 'profile', 'id']
         extra_kwargs = {'password': {'write_only': True, 'required': True}}
 
 
@@ -25,14 +25,14 @@ class AccountGetSerializer(AccountCreateSerializer):
 
 
 
-class PatientDetailsSerializer(serializers.ModelSerializer):
-    user = AccountGetSerializer(many=False)
+class PatientSerializer(serializers.ModelSerializer):
+    account = AccountGetSerializer(many=False)
 
     class Meta:
         model = Patient
-        fields = ('user')
-#
-#
+        fields = ('account',)
+
+
 # class DoctorSerializer(serializers.ModelSerializer):
 #     patient = PatientDetailsSerializer(many=True)
 #
