@@ -1,11 +1,10 @@
-from rest_framework.generics import get_object_or_404
-
 from accounts.models import Account
 from rest_framework import viewsets, status
 from rest_framework.authentication import TokenAuthentication
-from rest_framework.decorators import action
-from Api.Serializers import AccountCreateSerializer, AccountGetSerializer, PatientSerializer
-from Api.models import Patient, Doctor, Sugar_level, Email
+from Api.Serializers import AccountCreateSerializer, AccountGetSerializer, PatientListSerializer,\
+    PatientDetailSerializer, CooperateSerializer
+
+from Api.models import Patient, Doctor, Cooperate, Sugar_level, Email
 from rest_framework.permissions import IsAuthenticated, AllowAny
 from rest_framework.authtoken.views import ObtainAuthToken
 from rest_framework.authtoken.models import Token
@@ -70,17 +69,39 @@ class AccountViewSet (viewsets.ModelViewSet):
 
 class PatientViewSet(viewsets.ModelViewSet):
     queryset = Patient.objects.all()
-    serializer_class = PatientSerializer
+    serializer_class = PatientListSerializer
     permission_classes = (IsAuthenticated, )
     authentication_classes = (TokenAuthentication, )
 
 
     def retrieve(self, request, pk=None, **kwargs):
         patient = Patient.objects.get(account_id=pk)
-        serializer = PatientSerializer(patient)
-        import pdb;pdb.set_trace()
-        return Response(serializer.data)
+        return Response(PatientDetailSerializer(patient).data)
 
+
+class CooperateViewSet(viewsets.ModelViewSet):
+    queryset = Cooperate.objects.all()
+    serializer_class = CooperateSerializer
+    permission_classes = (IsAuthenticated,)
+    authentication_classes = (TokenAuthentication,)
+
+
+    def update(self, request, *args, **kwargs):
+        cooperate_realation = self.get_object()
+
+        if cooperate_realation.accept_sender == True and cooperate_realation.accept_reciver == True:
+            cooperate_realation.is_active = True
+
+        if cooperate_realation.rejected == True:
+            cooperate_realation.is_active = False
+
+
+
+            # sender = models.ForeignKey(Account, related_name='user_sender_cooperate', on_delete=models.DO_NOTHING)
+            # reciver = models.ForeignKey(Account, related_name='user_reciver_cooperate', on_delete=models.DO_NOTHING)
+            # accept_sender = models.BooleanField(default=False)
+            # accept_reciver = models.BooleanField(default=False)
+            # is_active = models.BooleanField(default=False)
     # def all_sugar(self):
     #     all_sugar = [x for x in Sugar_level.objects.filter(patient=self)]
     #     if len(all_sugar) > 0:

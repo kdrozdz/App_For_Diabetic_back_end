@@ -9,7 +9,7 @@ class Sugar_level(models.Model):
     level = models.IntegerField()
     date = models.DateTimeField(auto_now=True)
     without_a_meal = models.BooleanField(default=False)
-    patient = models.ForeignKey('Patient', on_delete=models.CASCADE, related_name='sugar')
+    patient = models.ForeignKey(Account, on_delete=models.CASCADE)
 
 
 class Patient(models.Model):
@@ -30,8 +30,10 @@ class Doctor(models.Model):
 class Cooperate(models.Model):
     sender = models.ForeignKey(Account, related_name='user_sender_cooperate', on_delete=models.DO_NOTHING)
     reciver = models.ForeignKey(Account, related_name='user_reciver_cooperate', on_delete=models.DO_NOTHING)
-    accept = models.BooleanField(default=False)
-
+    accept_sender = models.BooleanField(default=False)
+    accept_reciver = models.BooleanField(default=False)
+    is_active = models.BooleanField(default=False)
+    rejected = models.BooleanField(default=False)
 
 class Email(models.Model):
     sender = models.ForeignKey(Account, related_name='user_sender_email', on_delete=models.DO_NOTHING)

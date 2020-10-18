@@ -24,31 +24,34 @@ class AccountGetSerializer(AccountCreateSerializer):
                 fields.append(field)
 
 
-
-class PatientSerializer(serializers.ModelSerializer):
+class PatientListSerializer(serializers.ModelSerializer):
     account = AccountGetSerializer(many=False)
 
     class Meta:
         model = Patient
-        fields = ('account',)
+        fields = ['account',]
 
 
-# class DoctorSerializer(serializers.ModelSerializer):
-#     patient = PatientDetailsSerializer(many=True)
-#
-#     class Meta:
-#         model = Doctor
-#         fields = ('descript', 'id', 'patient')
-#
-#
-# class DoctorMinSerializer(serializers.ModelSerializer):
-#     user = UserSerializer(many=False)
-#
-#     class Meta:
-#         model = Doctor
-#         fields = ('descript', 'id', 'user')
-#
-#
+class PatientDetailSerializer(PatientListSerializer):
+
+    class Meta(PatientListSerializer.Meta):
+        fields = '__all__'
+
+
+class DoctorSerializer(serializers.ModelSerializer):
+    account = AccountGetSerializer(many=False)
+
+    class Meta:
+        model = Doctor
+        fields = ('account')
+
+
+class CooperateSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = Doctor
+        fields = '__all__'
+
+
 # class PatientSerializer(serializers.ModelSerializer):
 #     doctor = DoctorMinSerializer(many=False)
 #     user = UserSerializer(many=False)
