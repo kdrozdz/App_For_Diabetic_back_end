@@ -4,7 +4,7 @@ from rest_framework.authentication import TokenAuthentication
 from Api.Serializers import AccountCreateSerializer, AccountGetSerializer, PatientListSerializer, \
     PatientDetailSerializer, CooperateSerializer, DoctorGetSerializer, SugarLevelListSerializer, SugarLevelGetSerializer
 
-from Api.models import Patient, Doctor, Cooperate, Sugar_level, Email
+from Api.models import Patient, Doctor, Cooperate, SugarLevel
 from rest_framework.permissions import IsAuthenticated, AllowAny
 from rest_framework.authtoken.views import ObtainAuthToken
 from rest_framework.authtoken.models import Token
@@ -88,39 +88,37 @@ class CooperateViewSet(viewsets.ModelViewSet):
         if cooperate_realation.accept_sender and cooperate_realation.accept_reciver:
             cooperate_realation.is_active = True
 
-
         if cooperate_realation.rejected:
             cooperate_realation.is_active = False
 
 
 class DoctorViewSet(viewsets.ModelViewSet):
-   queryset = Doctor.objects.all()
-   serializer_class = DoctorGetSerializer
-   permission_classes = (IsAuthenticated,)
-   authentication_classes = (TokenAuthentication,)
+    queryset = Doctor.objects.all()
+    serializer_class = DoctorGetSerializer
+    permission_classes = (IsAuthenticated,)
+    authentication_classes = (TokenAuthentication,)
 
-   def retrieve(self, request, pk=None, **kwargs):
-       doctor = Doctor.objects.get(account_id=pk)
-       return Response(DoctorGetSerializer(doctor).data)
+    def retrieve(self, request, pk=None, **kwargs):
+        doctor = Doctor.objects.get(account_id=pk)
+        return Response(DoctorGetSerializer(doctor).data)
 
 
 class SugarLeveViewSet(viewsets.ModelViewSet):
-   queryset = Sugar_level.objects.all()
-   serializer_class = SugarLevelListSerializer
-   permission_classes = (IsAuthenticated,)
-   authentication_classes = (TokenAuthentication,)
+    queryset = SugarLevel.objects.all()
+    serializer_class = SugarLevelListSerializer
+    permission_classes = (IsAuthenticated,)
+    authentication_classes = (TokenAuthentication,)
 
+    def list(self, request, *args, **kwargs):
+        sugars = SugarLevel.objects.filter(account_id=request.data['pk']).order_by('-date')
+        serializer = SugarLevelGetSerializer(sugars, many=True)
+        return Response(serializer.data)
 
-   def list(self, request, *args, **kwargs):
-       sugars = Sugar_level.objects.filter(account_id=request.data['pk']).order_by('-date')
-       serializer = SugarLevelGetSerializer(sugars, many=True)
-       return Response(serializer.data)
-
-            # sender = models.ForeignKey(Account, related_name='user_sender_cooperate', on_delete=models.DO_NOTHING)
-            # reciver = models.ForeignKey(Account, related_name='user_reciver_cooperate', on_delete=models.DO_NOTHING)
-            # accept_sender = models.BooleanField(default=False)
-            # accept_reciver = models.BooleanField(default=False)
-            # is_active = models.BooleanField(default=False)
+        # sender = models.ForeignKey(Account, related_name='user_sender_cooperate', on_delete=models.DO_NOTHING)
+        # reciver = models.ForeignKey(Account, related_name='user_reciver_cooperate', on_delete=models.DO_NOTHING)
+        # accept_sender = models.BooleanField(default=False)
+        # accept_reciver = models.BooleanField(default=False)
+        # is_active = models.BooleanField(default=False)
     # def all_sugar(self):
     #     all_sugar = [x for x in Sugar_level.objects.filter(patient=self)]
     #     if len(all_sugar) > 0:

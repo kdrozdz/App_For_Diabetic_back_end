@@ -2,11 +2,11 @@ from accounts.models import Account
 from django.db import models
 
 
-class Sugar_level(models.Model):
+class SugarLevel(models.Model):
     level = models.IntegerField()
     date = models.DateTimeField(auto_now=True)
     without_a_meal = models.BooleanField(default=False)
-    account = models.ForeignKey(Account, on_delete=models.CASCADE , related_name='sugar_level')
+    account = models.ForeignKey(Account, on_delete=models.CASCADE, related_name='sugar_level')
 
 
 class Patient(models.Model):

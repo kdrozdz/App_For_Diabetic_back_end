@@ -1,7 +1,6 @@
 from rest_framework import serializers
 from accounts.models import Account
-from Api.models import Patient, Doctor, Sugar_level, Email
-
+from Api.models import Patient, Doctor, SugarLevel, Chat
 
 
 class AccountCreateSerializer(serializers.ModelSerializer):
@@ -15,7 +14,7 @@ class AccountGetSerializer(AccountCreateSerializer):
     profile_display = serializers.CharField(source='get_profile_display')
 
     class Meta(AccountCreateSerializer.Meta):
-        fields =[]
+        fields = []
 
         for field in AccountCreateSerializer.Meta.fields:
             if field == 'profile':
@@ -29,7 +28,7 @@ class PatientListSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = Patient
-        fields = ['account',]
+        fields = ['account', ]
 
 
 class PatientDetailSerializer(PatientListSerializer):
@@ -44,11 +43,12 @@ class DoctorGetSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = Doctor
-        fields = ('account')
+        fields = 'account',
 
     # def get_patients(self):
     #     out_put = PatientListSerializer(self.objects.patient.all(),many=True).data
     #     return out_put
+
 
 class CooperateSerializer(serializers.ModelSerializer):
     class Meta:
@@ -58,35 +58,17 @@ class CooperateSerializer(serializers.ModelSerializer):
 
 class SugarLevelListSerializer(serializers.ModelSerializer):
     class Meta:
-        model = Sugar_level
-        fields = ['level',]
+        model = SugarLevel
+        fields = ['level', ]
 
 
 class SugarLevelGetSerializer(serializers.ModelSerializer):
     class Meta:
-        model = Sugar_level
-        exclude = ['account',]
+        model = SugarLevel
+        exclude = ['account', ]
 
 
 class ChatSerializer(serializers.ModelSerializer):
     class Meta:
-        model = Email
+        model = Chat
         fields = '__all__'
-
-# class PatientSerializer(serializers.ModelSerializer):
-#     doctor = DoctorMinSerializer(many=False)
-#     user = UserSerializer(many=False)
-#     all_sugar = SugarLevelSerializer(many=True)
-#
-#     class Meta:
-#         model = Patient
-#         fields = ('user', 'id', 'doctor', 'avg_sugar', 'avg_sugar_10', "avg_no_meal", 'all_sugar')
-#         depth = 1
-#
-#
-
-
-# class SugarLevelSerializer(serializers.ModelSerializer):
-#     class Meta:
-#         model = Sugar_level
-#         exclude = ['patient', 'id']
