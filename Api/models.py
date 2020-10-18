@@ -1,15 +1,12 @@
-from rest_framework.authtoken.models import Token
 from accounts.models import Account
 from django.db import models
-from django.db.models.signals import post_save
-from django.dispatch import receiver
 
 
 class Sugar_level(models.Model):
     level = models.IntegerField()
     date = models.DateTimeField(auto_now=True)
     without_a_meal = models.BooleanField(default=False)
-    patient = models.ForeignKey(Account, on_delete=models.CASCADE)
+    account = models.ForeignKey(Account, on_delete=models.CASCADE , related_name='sugar_level')
 
 
 class Patient(models.Model):
@@ -35,7 +32,8 @@ class Cooperate(models.Model):
     is_active = models.BooleanField(default=False)
     rejected = models.BooleanField(default=False)
 
-class Email(models.Model):
+
+class Chat(models.Model):
     sender = models.ForeignKey(Account, related_name='user_sender_email', on_delete=models.DO_NOTHING)
     reciver = models.ForeignKey(Account, related_name='user_reciver_email', on_delete=models.DO_NOTHING)
     is_new = models.BooleanField(default=True)

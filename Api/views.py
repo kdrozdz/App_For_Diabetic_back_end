@@ -1,8 +1,8 @@
 from accounts.models import Account
 from rest_framework import viewsets, status
 from rest_framework.authentication import TokenAuthentication
-from Api.Serializers import AccountCreateSerializer, AccountGetSerializer, PatientListSerializer,\
-    PatientDetailSerializer, CooperateSerializer
+from Api.Serializers import AccountCreateSerializer, AccountGetSerializer, PatientListSerializer, \
+    PatientDetailSerializer, CooperateSerializer, DoctorGetSerializer, SugarLevelListSerializer, SugarLevelGetSerializer
 
 from Api.models import Patient, Doctor, Cooperate, Sugar_level, Email
 from rest_framework.permissions import IsAuthenticated, AllowAny
@@ -19,27 +19,25 @@ class CustomObtainAuthToken(ObtainAuthToken):
     def post(self, request, *args, **kwargs):
         response = super(CustomObtainAuthToken, self).post(request, *args, **kwargs)
         token = Token.objects.get(key=response.data['token'])
-        return Response({'token': token.key, 'id': token.user_id, 'profile':token.user.get_profile_display()})
+        return Response({'token': token.key, 'id': token.user_id, 'profile': token.user.get_profile_display()})
 
 
-class AccountViewSet (viewsets.ModelViewSet):
+class AccountViewSet(viewsets.ModelViewSet):
     queryset = Account.objects.all()
-    authentication_classes = (TokenAuthentication, )
-    permission_classes = (AllowAny, )
+    authentication_classes = (TokenAuthentication,)
+    permission_classes = (AllowAny,)
     serializer_class = AccountGetSerializer
 
     def get_permissions(self):
-        if self.action in ('create', ):
+        if self.action in ('create',):
             self.permission_classes = (AllowAny,)
         else:
             self.permission_classes = (IsAuthenticated,)
         return super(self.__class__, self).get_permissions()
 
-
     def create(self, request, *args, **kwargs):
-        if(Account.objects.filter(email=request.data['email']).exists()):
+        if Account.objects.filter(email=request.data['email']).exists():
             return Response("This email address is already being used")
-
         serializer = AccountCreateSerializer(data=request.data)
         if serializer.is_valid():
 
@@ -49,7 +47,7 @@ class AccountViewSet (viewsets.ModelViewSet):
                 email=request.data['email'],
                 age=request.data['age'],
                 profile=request.data['profile'],
-                phone_number=request.data['phone_number'],
+                phone_number=request.data['phone_number']
             )
 
             account.set_password(request.data['password'])
@@ -59,7 +57,7 @@ class AccountViewSet (viewsets.ModelViewSet):
             if account.profile == '1':
                 doctor = Doctor.objects.create(account=account)
                 doctor.save()
-            elif account.profile == '2':
+            else:
                 patient = Patient.objects.create(account=account)
                 patient.save()
 
@@ -70,9 +68,8 @@ class AccountViewSet (viewsets.ModelViewSet):
 class PatientViewSet(viewsets.ModelViewSet):
     queryset = Patient.objects.all()
     serializer_class = PatientListSerializer
-    permission_classes = (IsAuthenticated, )
-    authentication_classes = (TokenAuthentication, )
-
+    permission_classes = (IsAuthenticated,)
+    authentication_classes = (TokenAuthentication,)
 
     def retrieve(self, request, pk=None, **kwargs):
         patient = Patient.objects.get(account_id=pk)
@@ -85,17 +82,39 @@ class CooperateViewSet(viewsets.ModelViewSet):
     permission_classes = (IsAuthenticated,)
     authentication_classes = (TokenAuthentication,)
 
-
     def update(self, request, *args, **kwargs):
         cooperate_realation = self.get_object()
 
-        if cooperate_realation.accept_sender == True and cooperate_realation.accept_reciver == True:
+        if cooperate_realation.accept_sender and cooperate_realation.accept_reciver:
             cooperate_realation.is_active = True
 
-        if cooperate_realation.rejected == True:
+
+        if cooperate_realation.rejected:
             cooperate_realation.is_active = False
 
 
+class DoctorViewSet(viewsets.ModelViewSet):
+   queryset = Doctor.objects.all()
+   serializer_class = DoctorGetSerializer
+   permission_classes = (IsAuthenticated,)
+   authentication_classes = (TokenAuthentication,)
+
+   def retrieve(self, request, pk=None, **kwargs):
+       doctor = Doctor.objects.get(account_id=pk)
+       return Response(DoctorGetSerializer(doctor).data)
+
+
+class SugarLeveViewSet(viewsets.ModelViewSet):
+   queryset = Sugar_level.objects.all()
+   serializer_class = SugarLevelListSerializer
+   permission_classes = (IsAuthenticated,)
+   authentication_classes = (TokenAuthentication,)
+
+
+   def list(self, request, *args, **kwargs):
+       sugars = Sugar_level.objects.filter(account_id=request.data['pk']).order_by('-date')
+       serializer = SugarLevelGetSerializer(sugars, many=True)
+       return Response(serializer.data)
 
             # sender = models.ForeignKey(Account, related_name='user_sender_cooperate', on_delete=models.DO_NOTHING)
             # reciver = models.ForeignKey(Account, related_name='user_reciver_cooperate', on_delete=models.DO_NOTHING)
@@ -145,28 +164,9 @@ class CooperateViewSet(viewsets.ModelViewSet):
     #     pateint = Patient.objects.filter(doctor=None)
     #     serializer = PatientDetailsSerializer(pateint, many=True)
     #     return Response(serializer.data)
-#
-#
+
 # class DoctorViewSet(viewsets.ModelViewSet):
-#     queryset = Doctor.objects.all()
-#     serializer_class = DoctorSerializer
-#     permission_classes = (IsAuthenticated,)
-#     authentication_classes = (TokenAuthentication,)
-#
-#     def retrieve(self, request, pk=None, **kwargs):
-#         instance = Doctor.objects.get(user_id=pk)
-#         serializer = DoctorSerializer(instance)
-#         return Response(serializer.data)
-#
-#     @action(detail=True, methods=['post'])
-#     def add_patient(self, request, pk=None, **kwargs):
-#         doctor = Doctor.objects.get(user_id=pk)
-#         patients = Patient.objects.get(user_id=request.data['patient_pk'])
-#         patients.doctor = doctor
-#         patients.save()
-#         serializer = PatientDetailsSerializer(patients)
-#         return Response(serializer.data)
-#
+
 #     @action(detail=True)
 #     def my_patients(self, request, *args, pk=None, **kwargs):
 #         patients = Patient.objects.filter(doctor__user=pk)
@@ -179,19 +179,8 @@ class CooperateViewSet(viewsets.ModelViewSet):
 #         patient.doctor = None
 #         patient.save()
 #         return Response(None)
-#
-#
-# class SugarLeveViewSet(viewsets.ModelViewSet):
-#     queryset = Sugar_level.objects.all()
-#     serializer_class = SugarLevelSerializer
-#     permission_classes = (IsAuthenticated,)
-#     authentication_classes = (TokenAuthentication,)
-#
-#     def list(self, request, *args, **kwargs):
-#         sugars = Sugar_level.objects.filter(patient__user=request.query_params.get('pk')).order_by('-date')
-#         serializer = SugarLevelSerializer(sugars, many=True)
-#         return Response(serializer.data)
-#
+
+
 #
 # class EmailViewSet(viewsets.ModelViewSet):
 #     queryset = Email.objects.all()

@@ -38,19 +38,40 @@ class PatientDetailSerializer(PatientListSerializer):
         fields = '__all__'
 
 
-class DoctorSerializer(serializers.ModelSerializer):
+class DoctorGetSerializer(serializers.ModelSerializer):
     account = AccountGetSerializer(many=False)
+    # patients = serializers.SerializerMethodField('get_patient')
 
     class Meta:
         model = Doctor
         fields = ('account')
 
+    # def get_patients(self):
+    #     out_put = PatientListSerializer(self.objects.patient.all(),many=True).data
+    #     return out_put
 
 class CooperateSerializer(serializers.ModelSerializer):
     class Meta:
         model = Doctor
         fields = '__all__'
 
+
+class SugarLevelListSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = Sugar_level
+        fields = ['level',]
+
+
+class SugarLevelGetSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = Sugar_level
+        exclude = ['account',]
+
+
+class ChatSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = Email
+        fields = '__all__'
 
 # class PatientSerializer(serializers.ModelSerializer):
 #     doctor = DoctorMinSerializer(many=False)
@@ -63,10 +84,7 @@ class CooperateSerializer(serializers.ModelSerializer):
 #         depth = 1
 #
 #
-# class EmailSerializer(serializers.ModelSerializer):
-#     class Meta:
-#         model = Email
-#         fields = '__all__'
+
 
 # class SugarLevelSerializer(serializers.ModelSerializer):
 #     class Meta:

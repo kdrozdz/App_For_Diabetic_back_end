@@ -51,7 +51,7 @@ class Account(AbstractBaseUser):
 	last_name = models.CharField(max_length=32)
 	first_name = models.CharField(max_length=32)
 	age = models.IntegerField(validators=[MinValueValidator(1), MaxValueValidator(120)])
-	profile = models.IntegerField(choices=((1, 'Doctor'), (2, 'Patient')))
+	profile = models.IntegerField(choices=((1, 'Doctor'), (0, 'Patient')))
 	phone_number = models.IntegerField()
 
 	USERNAME_FIELD = 'email'
