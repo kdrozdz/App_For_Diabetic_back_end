@@ -1,13 +1,13 @@
 from rest_framework.exceptions import ErrorDetail
 from  rest_framework.test import APITestCase
 from rest_framework import status
-from Api.tests.data import account_data
+from Api.tests.data import account_data_patient
 
 
 class RegistrationTestCase(APITestCase):
 
     def setUp(self):
-        self.data = account_data
+        self.data = account_data_patient
 
     def test_registration(self):
         response = self.client.post("/accounts/", self.data)

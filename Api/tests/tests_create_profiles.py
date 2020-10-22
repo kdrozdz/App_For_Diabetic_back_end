@@ -1,6 +1,6 @@
 from Api.models import Patient, Doctor
 from rest_framework.test import APITestCase
-
+from Api.tests.data import account_data_patient
 
 class CreateProfileTestCase(APITestCase):
 
