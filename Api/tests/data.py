@@ -1,6 +1,6 @@
 from accounts.models import Account
 
-account_data = {
+account_data_patient = {
     'password': 'test123',
     'last_name': 'test123',
     'first_name': 'test123',
@@ -11,5 +11,5 @@ account_data = {
 }
 
 def create_account():
-    account = Account.objects.create_user(**account_data)
+    account = Account.objects.create_user(**account_data_patient)
     return account
