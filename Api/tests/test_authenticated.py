@@ -2,7 +2,7 @@ from accounts.models import Account
 from rest_framework.authtoken.models import Token
 from rest_framework.test import APITestCase
 from rest_framework import status
-
+from Api.tests.data import account_data
 
 class TestAuthenticatedViews(APITestCase):
 
@@ -12,15 +12,7 @@ class TestAuthenticatedViews(APITestCase):
 
 
     def setUp(self):
-        self.account = Account.objects.create_user(
-            password='test123',
-            last_name='test123',
-            first_name='test123',
-            email='test123@test.com',
-            age=32,
-            profile=0,
-            phone_number=999888444,
-        )
+        self.account = Account.objects.create_user(**account_data)
         self.token = Token.objects.create(user=self.account)
         self.api_authentication()
 

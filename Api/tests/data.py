@@ -1,3 +1,4 @@
+from accounts.models import Account
 
 account_data = {
     'password': 'test123',
@@ -8,3 +9,7 @@ account_data = {
     'profile': 0,
     'phone_number': 999888444,
 }
+
+def create_account():
+    account = Account.objects.create_user(**account_data)
+    return account
