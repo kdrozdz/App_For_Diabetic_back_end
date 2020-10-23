@@ -59,13 +59,18 @@ class CooperateSerializer(serializers.ModelSerializer):
 class SugarLevelListSerializer(serializers.ModelSerializer):
     class Meta:
         model = SugarLevel
-        fields = ['level', ]
+        fields = ['level', 'date']
 
 
 class SugarLevelGetSerializer(serializers.ModelSerializer):
     class Meta:
         model = SugarLevel
         exclude = ['account', ]
+
+class SugarLevelCreateSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = SugarLevel
+        fields = '__all__'
 
 
 class ChatSerializer(serializers.ModelSerializer):

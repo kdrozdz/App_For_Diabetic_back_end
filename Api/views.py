@@ -1,8 +1,10 @@
+from functools import reduce
+
 from accounts.models import Account
 from rest_framework import viewsets, status
 from rest_framework.authentication import TokenAuthentication
 from Api.Serializers import AccountCreateSerializer, AccountGetSerializer, PatientListSerializer, \
-    PatientDetailSerializer, CooperateSerializer, DoctorGetSerializer, SugarLevelListSerializer, SugarLevelGetSerializer
+    PatientDetailSerializer, CooperateSerializer, DoctorGetSerializer, SugarLevelCreateSerializer, SugarLevelListSerializer, SugarLevelGetSerializer
 
 from Api.models import Patient, Doctor, Cooperate, SugarLevel
 from rest_framework.permissions import IsAuthenticated, AllowAny
@@ -10,7 +12,7 @@ from rest_framework.authtoken.views import ObtainAuthToken
 from rest_framework.authtoken.models import Token
 from rest_framework.response import Response
 from rest_framework.authtoken.serializers import AuthTokenSerializer
-
+from operator import mul
 
 class CustomObtainAuthToken(ObtainAuthToken):
     serializer_class = AuthTokenSerializer
@@ -105,14 +107,26 @@ class DoctorViewSet(viewsets.ModelViewSet):
 
 class SugarLeveViewSet(viewsets.ModelViewSet):
     queryset = SugarLevel.objects.all()
-    serializer_class = SugarLevelListSerializer
+    serializer_class = SugarLevelCreateSerializer
     permission_classes = (IsAuthenticated,)
     authentication_classes = (TokenAuthentication,)
 
     def list(self, request, *args, **kwargs):
         sugars = SugarLevel.objects.filter(account_id=request.data['pk']).order_by('-date')
-        serializer = SugarLevelGetSerializer(sugars, many=True)
-        return Response(serializer.data)
+        serializer_last_five = SugarLevelGetSerializer(sugars[:5], many=True)
+        serializer_list_all = SugarLevelGetSerializer(sugars, many=True)
+        avreage_all_sugars = round(sum([sugar.level for sugar in sugars])/len(sugars))
+        avreage_last_five_sugars = round(sum([sugar.level for sugar in sugars[:5]])/len(sugars[:5]))
+        sum_all_fast_blood_sugar = round(sum([sugar.level for sugar in sugars if sugar.without_a_meal == True]))
+
+        out_put = {
+            'list_of_all_sugars': serializer_list_all.data,
+            'last_five_sugars': serializer_last_five.data,
+            'avreage_all_sugars': avreage_all_sugars,
+            'avreage_last_five_sugars': avreage_last_five_sugars,
+            'sum_all_fast_blood_sugar': sum_all_fast_blood_sugar,
+        }
+        return Response(out_put)
 
         # sender = models.ForeignKey(Account, related_name='user_sender_cooperate', on_delete=models.DO_NOTHING)
         # reciver = models.ForeignKey(Account, related_name='user_reciver_cooperate', on_delete=models.DO_NOTHING)
