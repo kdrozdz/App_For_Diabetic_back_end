@@ -21,7 +21,6 @@ class RegistrationTestCase(APITestCase):
         self.assertEqual(response.data, 'This email address is already being used')
 
     def test_registration_not_full_data(self):
-        data = self.data
-        data['email'] = False
+        self.data['email'] = False
         response = self.client.post("/accounts/", self.data)
         self.assertEqual(response.data, {'email': [ErrorDetail(string='Enter a valid email address.', code='invalid')]})

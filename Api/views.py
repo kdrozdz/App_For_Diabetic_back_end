@@ -1,5 +1,7 @@
 from functools import reduce
 
+from rest_framework.decorators import action
+
 from accounts.models import Account
 from rest_framework import viewsets, status
 from rest_framework.authentication import TokenAuthentication
@@ -100,8 +102,8 @@ class DoctorViewSet(viewsets.ModelViewSet):
     permission_classes = (IsAuthenticated,)
     authentication_classes = (TokenAuthentication,)
 
-    def retrieve(self, request, pk=None, **kwargs):
-        doctor = Doctor.objects.get(account_id=pk)
+    def retrieve(self, request, **kwargs):
+        doctor = Doctor.objects.get(account_id=request.data['pk'])
         return Response(DoctorGetSerializer(doctor).data)
 
 
@@ -111,20 +113,21 @@ class SugarLeveViewSet(viewsets.ModelViewSet):
     permission_classes = (IsAuthenticated,)
     authentication_classes = (TokenAuthentication,)
 
-    def list(self, request, *args, **kwargs):
+    @action(detail=False, methods=['post'])
+    def all_info(self, request):
         sugars = SugarLevel.objects.filter(account_id=request.data['pk']).order_by('-date')
-        serializer_last_five = SugarLevelGetSerializer(sugars[:5], many=True)
+        fast_blood_sugars = [sugar.level for sugar in sugars if sugar.without_a_meal == True]
+
         serializer_list_all = SugarLevelGetSerializer(sugars, many=True)
-        avreage_all_sugars = round(sum([sugar.level for sugar in sugars])/len(sugars))
-        avreage_last_five_sugars = round(sum([sugar.level for sugar in sugars[:5]])/len(sugars[:5]))
-        sum_all_fast_blood_sugar = round(sum([sugar.level for sugar in sugars if sugar.without_a_meal == True]))
+        avreage_all_sugars = round(sum([sugar.level for sugar in sugars])/len(sugars)) if len(sugars) > 0 else 0
+        avreage_last_five_sugars = round(sum([sugar.level for sugar in sugars[:5]])/len(sugars[:5])) if len(sugars[:5]) > 0 else 0
+        avreage_all_fast_blood_sugar = round(sum(fast_blood_sugars)/len(fast_blood_sugars)) if len(fast_blood_sugars) > 0 else 0
 
         out_put = {
             'list_of_all_sugars': serializer_list_all.data,
-            'last_five_sugars': serializer_last_five.data,
             'avreage_all_sugars': avreage_all_sugars,
             'avreage_last_five_sugars': avreage_last_five_sugars,
-            'sum_all_fast_blood_sugar': sum_all_fast_blood_sugar,
+            'avreage_all_fast_blood_sugar': avreage_all_fast_blood_sugar,
         }
         return Response(out_put)
 
