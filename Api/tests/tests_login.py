@@ -2,7 +2,7 @@ from rest_framework.exceptions import ErrorDetail
 from accounts.models import Account
 from rest_framework.test import APITestCase
 from rest_framework import status
-from Api.tests.data import account_data_patient
+from Api.tests.data import Init
 
 
 class TestAuthenticatedViews(APITestCase):
@@ -10,10 +10,11 @@ class TestAuthenticatedViews(APITestCase):
     url_auth = '/auth/'
 
     def setUp(self):
-        self.account = Account.objects.create_user(**account_data_patient)
+        self.data = Init()
+        self.account = Account.objects.create_user(**self.data.account_data_patient)
 
     def test_login_return_token_id_profile(self):
-        response = self.client.post(self.url_auth, {'username': self.account.email, 'password': account_data_patient['password']})
+        response = self.client.post(self.url_auth, {'username': self.account.email, 'password': self.data.account_data_patient['password']})
         self.assertEqual(response.status_code, status.HTTP_200_OK)
         self.assertEqual(response.data, {'token': response.data['token'], 'id': 1, 'profile': 'Patient'})
 

@@ -39,4 +39,3 @@ class TestSugarViews(APITestCase):
         self.assertEqual(response.data['avreage_all_sugars'], 158)
         self.assertEqual(response.data['avreage_last_five_sugars'], 170)
         self.assertEqual(len(response.data['list_of_all_sugars']), 6)
-
