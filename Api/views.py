@@ -1,20 +1,16 @@
-from functools import reduce
-
 from rest_framework.decorators import action
-
 from accounts.models import Account
 from rest_framework import viewsets, status
 from rest_framework.authentication import TokenAuthentication
 from Api.Serializers import AccountCreateSerializer, AccountGetSerializer, PatientListSerializer, \
     PatientDetailSerializer, CooperateSerializer, DoctorGetSerializer, SugarLevelCreateSerializer, SugarLevelListSerializer, SugarLevelGetSerializer
-
 from Api.models import Patient, Doctor, Cooperate, SugarLevel
 from rest_framework.permissions import IsAuthenticated, AllowAny
 from rest_framework.authtoken.views import ObtainAuthToken
 from rest_framework.authtoken.models import Token
 from rest_framework.response import Response
 from rest_framework.authtoken.serializers import AuthTokenSerializer
-from operator import mul
+
 
 class CustomObtainAuthToken(ObtainAuthToken):
     serializer_class = AuthTokenSerializer
@@ -75,9 +71,9 @@ class PatientViewSet(viewsets.ModelViewSet):
     permission_classes = (IsAuthenticated,)
     authentication_classes = (TokenAuthentication,)
 
-    def retrieve(self, request, pk=None, **kwargs):
-        patient = Patient.objects.get(account_id=pk)
-        return Response(PatientDetailSerializer(patient).data)
+    def get_serializer_class(self):
+        if self.action == 'retrieve':
+            return PatientDetailSerializer
 
 
 class CooperateViewSet(viewsets.ModelViewSet):

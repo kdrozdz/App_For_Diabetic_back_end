@@ -39,3 +39,10 @@ class TestSugarViews(APITestCase):
         self.assertEqual(response.data['avreage_all_sugars'], 158)
         self.assertEqual(response.data['avreage_last_five_sugars'], 170)
         self.assertEqual(len(response.data['list_of_all_sugars']), 6)
+
+    def test_all_info_null_data_new_users(self):
+        response = self.client.post('/sugar/all_info/',{'pk':self.account.id})
+        self.assertEqual(response.data['avreage_all_fast_blood_sugar'], 0)
+        self.assertEqual(response.data['avreage_all_sugars'], 0)
+        self.assertEqual(response.data['avreage_last_five_sugars'], 0)
+        self.assertEqual(len(response.data['list_of_all_sugars']), 0)
