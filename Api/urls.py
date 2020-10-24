@@ -8,6 +8,7 @@ router.register('accounts', AccountViewSet)
 router.register('cooperate', CooperateViewSet)
 router.register('patient', PatientViewSet)
 router.register('sugar', SugarLeveViewSet)
+router.register('sugar', SugarLeveViewSet)
 router.register('doctors', DoctorViewSet)
 # router.register('email',EmailViewSet),
 

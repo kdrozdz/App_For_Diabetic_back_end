@@ -2,7 +2,7 @@ from accounts.models import Account
 from rest_framework.authtoken.models import Token
 from rest_framework.test import APITestCase
 from rest_framework import status
-from Api.tests.data import account_data_patient
+from Api.tests.data import Init
 
 
 class TestAuthenticatedViews(APITestCase):
@@ -12,7 +12,8 @@ class TestAuthenticatedViews(APITestCase):
     url_doctors = '/doctors/'
 
     def setUp(self):
-        self.account = Account.objects.create_user(**account_data_patient)
+        self.data = Init()
+        self.account = Account.objects.create_user(**self.data.account_data_patient)
         self.token = Token.objects.create(user=self.account)
         self.api_authentication()
 
