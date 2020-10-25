@@ -25,12 +25,14 @@ class Doctor(models.Model):
 
 
 class Cooperate(models.Model):
-    sender = models.ForeignKey(Account, related_name='user_sender_cooperate', on_delete=models.DO_NOTHING)
-    reciver = models.ForeignKey(Account, related_name='user_reciver_cooperate', on_delete=models.DO_NOTHING)
-    accept_sender = models.BooleanField(default=False)
-    accept_reciver = models.BooleanField(default=False)
+    patient = models.ForeignKey(Account, related_name='patient_cooperate', on_delete=models.DO_NOTHING)
+    doctor = models.ForeignKey(Account, related_name='doctor_cooperate', on_delete=models.DO_NOTHING)
+    accept_patient = models.BooleanField(default=False)
+    accept_doctor = models.BooleanField(default=False)
     is_active = models.BooleanField(default=False)
     rejected = models.BooleanField(default=False)
+    messagge = models.TextField(max_length=256, blank=True)
+    date = models.DateTimeField(auto_now_add=True)
 
 
 class Chat(models.Model):

@@ -1,6 +1,6 @@
 from rest_framework import serializers
 from accounts.models import Account
-from Api.models import Patient, Doctor, SugarLevel, Chat
+from Api.models import Patient, Doctor, SugarLevel, Chat, Cooperate
 
 
 class AccountCreateSerializer(serializers.ModelSerializer):
@@ -8,6 +8,13 @@ class AccountCreateSerializer(serializers.ModelSerializer):
         model = Account
         fields = ['email', 'first_name', 'last_name', 'age', 'phone_number', 'password', 'profile', 'id']
         extra_kwargs = {'password': {'write_only': True, 'required': True}}
+
+
+class AccountListSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = Account
+        fields = ['email', 'first_name', 'last_name', 'age', 'phone_number', 'id']
+
 
 
 class AccountGetSerializer(AccountCreateSerializer):
@@ -49,10 +56,21 @@ class DoctorGetSerializer(serializers.ModelSerializer):
     #     out_put = PatientListSerializer(self.objects.patient.all(),many=True).data
     #     return out_put
 
+class DoctorListSerializer(serializers.ModelSerializer):
+    import pdb;
+    pdb.set_trace()
+    Accovsdunt = AccountListSerializer(many=True)
+    import pdb;
+    pdb.set_trace()
+
+    class Meta:
+        model = Doctor
+        fields = ['Account',]
+
 
 class CooperateSerializer(serializers.ModelSerializer):
     class Meta:
-        model = Doctor
+        model = Cooperate
         fields = '__all__'
 
 
