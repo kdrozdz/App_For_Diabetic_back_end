@@ -16,7 +16,6 @@ class AccountListSerializer(serializers.ModelSerializer):
         fields = ['email', 'first_name', 'last_name', 'age', 'phone_number', 'id']
 
 
-
 class AccountGetSerializer(AccountCreateSerializer):
     profile_display = serializers.CharField(source='get_profile_display')
 
@@ -57,15 +56,11 @@ class DoctorGetSerializer(serializers.ModelSerializer):
     #     return out_put
 
 class DoctorListSerializer(serializers.ModelSerializer):
-    import pdb;
-    pdb.set_trace()
-    Accovsdunt = AccountListSerializer(many=True)
-    import pdb;
-    pdb.set_trace()
+    account = AccountListSerializer(many=False)
 
     class Meta:
         model = Doctor
-        fields = ['Account',]
+        fields = ['account',]
 
 
 class CooperateSerializer(serializers.ModelSerializer):

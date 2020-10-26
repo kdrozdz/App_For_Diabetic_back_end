@@ -4,7 +4,7 @@ from rest_framework import viewsets, status
 from rest_framework.authentication import TokenAuthentication
 from Api.Serializers import AccountCreateSerializer, AccountGetSerializer, PatientListSerializer, \
     PatientDetailSerializer, CooperateSerializer, DoctorGetSerializer, SugarLevelCreateSerializer, \
-    SugarLevelListSerializer, SugarLevelGetSerializer, DoctorListSerializer
+    SugarLevelListSerializer, SugarLevelGetSerializer, DoctorListSerializer, AccountListSerializer
 from Api.models import Patient, Doctor, Cooperate, SugarLevel
 from rest_framework.permissions import IsAuthenticated, AllowAny
 from rest_framework.authtoken.views import ObtainAuthToken

@@ -18,7 +18,7 @@ class Patient(models.Model):
 
 
 class Doctor(models.Model):
-    account = models.OneToOneField(Account, on_delete=models.CASCADE)
+    account = models.OneToOneField(Account, on_delete=models.CASCADE, related_name='doctor')
 
     def __str__(self):
         return f' {self.account.email} {self.account} '
