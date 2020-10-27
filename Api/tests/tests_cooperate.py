@@ -30,9 +30,7 @@ class TestCooperateViews(APITestCase):
 
     def test_i_have_sent_cooperate(self):
         first_response = self.client.post(self.url_cooperate + self.url_have_i_sent, {'pk': self.patient.id})
-        self.assertEqual(first_response.data, False)
-
+        self.assertEqual(first_response.data, {'go_to_doctor_list': True})
         self.client.post(self.url_cooperate, {'patient': self.patient.id, 'doctor': self.doctor.id})
-
         second_response = self.client.post(self.url_cooperate + self.url_have_i_sent , {'pk': self.patient.id})
-        self.assertEqual(second_response.data, True)
+        self.assertEqual(second_response.data['go_to_doctor_list'], False )

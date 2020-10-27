@@ -5,7 +5,8 @@ from rest_framework.authentication import TokenAuthentication
 from Api.Serializers import AccountCreateSerializer, AccountGetSerializer, PatientListSerializer, \
     PatientDetailSerializer, DoctorGetSerializer, SugarLevelCreateSerializer, \
     SugarLevelListSerializer, CooperateGetSerializer, SugarLevelGetSerializer, DoctorListSerializer, AccountListSerializer, \
-    CooperateSerializer
+    CooperateCreateSerializer
+
 from Api.models import Patient, Doctor, Cooperate, SugarLevel
 from rest_framework.permissions import IsAuthenticated, AllowAny
 from rest_framework.authtoken.views import ObtainAuthToken
@@ -80,7 +81,7 @@ class PatientViewSet(viewsets.ModelViewSet):
 
 class CooperateViewSet(viewsets.ModelViewSet):
     queryset = Cooperate.objects.all()
-    serializer_class = CooperateSerializer
+    serializer_class = CooperateCreateSerializer
     permission_classes = (IsAuthenticated,)
     authentication_classes = (TokenAuthentication,)
 
@@ -96,8 +97,10 @@ class CooperateViewSet(viewsets.ModelViewSet):
     @action(detail=False, methods=['post'])
     def have_i_sent_cooperate(self, request):
         if Cooperate.objects.filter(patient=request.data['pk']).filter(rejected=False).exists():
-            return Response(CooperateGetSerializer(Cooperate.objects.get(patient=request.data['pk'], rejected=False), many=False).data)
-        return Response(False)
+            response_obj = CooperateGetSerializer(Cooperate.objects.get(patient=request.data['pk'], rejected=False), many=False).data
+            response_obj['go_to_doctor_list'] = False
+            return Response(response_obj)
+        return Response({'go_to_doctor_list': True})
 
 
 class DoctorViewSet(viewsets.ModelViewSet):
