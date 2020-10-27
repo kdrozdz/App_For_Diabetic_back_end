@@ -4,7 +4,7 @@ from rest_framework import viewsets, status
 from rest_framework.authentication import TokenAuthentication
 from Api.Serializers import AccountCreateSerializer, AccountGetSerializer, PatientListSerializer, \
     PatientDetailSerializer, DoctorGetSerializer, SugarLevelCreateSerializer, \
-    SugarLevelListSerializer, SugarLevelGetSerializer, DoctorListSerializer, AccountListSerializer, \
+    SugarLevelListSerializer, CooperateGetSerializer, SugarLevelGetSerializer, DoctorListSerializer, AccountListSerializer, \
     CooperateSerializer
 from Api.models import Patient, Doctor, Cooperate, SugarLevel
 from rest_framework.permissions import IsAuthenticated, AllowAny
@@ -96,7 +96,7 @@ class CooperateViewSet(viewsets.ModelViewSet):
     @action(detail=False, methods=['post'])
     def have_i_sent_cooperate(self, request):
         if Cooperate.objects.filter(patient=request.data['pk']).filter(rejected=False).exists():
-            return Response(CooperateSerializer(Cooperate.objects.get(patient=request.data['pk'], rejected=False), many=False).data)
+            return Response(CooperateGetSerializer(Cooperate.objects.get(patient=request.data['pk'], rejected=False), many=False).data)
         return Response(False)
 
 

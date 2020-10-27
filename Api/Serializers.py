@@ -63,6 +63,14 @@ class DoctorListSerializer(serializers.ModelSerializer):
         fields = ['account',]
 
 
+class CooperateGetSerializer(serializers.ModelSerializer):
+    doctor = AccountGetSerializer(many=False)
+    patient = AccountGetSerializer(many=False)
+    class Meta:
+        model = Cooperate
+        fields = ['doctor', 'patient', 'message', 'date']
+
+
 class CooperateSerializer(serializers.ModelSerializer):
     class Meta:
         model = Cooperate
