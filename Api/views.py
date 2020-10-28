@@ -102,6 +102,13 @@ class CooperateViewSet(viewsets.ModelViewSet):
             return Response(response_obj)
         return Response({'go_to_doctor_list': True})
 
+    @action(detail=False, methods=['post'])
+    def reject_cooperate(self, request):
+        cooperte_obj = Cooperate.objects.get(id=request.data['pk'])
+        cooperte_obj.rejected = True
+        cooperte_obj.save()
+        return Response(status.HTTP_200_OK)
+
 
 class DoctorViewSet(viewsets.ModelViewSet):
     queryset = Doctor.objects.all()

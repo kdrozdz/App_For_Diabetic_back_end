@@ -10,6 +10,7 @@ from rest_framework.authtoken.models import Token
 class TestCooperateViews(APITestCase):
     url_cooperate = '/cooperate/'
     url_have_i_sent = 'have_i_sent_cooperate/'
+    url_rejected= 'reject_cooperate/'
     data = Init()
 
     def setUp(self):
@@ -34,3 +35,11 @@ class TestCooperateViews(APITestCase):
         self.client.post(self.url_cooperate, {'patient': self.patient.id, 'doctor': self.doctor.id})
         second_response = self.client.post(self.url_cooperate + self.url_have_i_sent , {'pk': self.patient.id})
         self.assertEqual(second_response.data['go_to_doctor_list'], False )
+
+    def test_rejected_cooperate(self):
+        self.client.post(self.url_cooperate, {'patient': self.patient.id, 'doctor': self.doctor.id})
+        first_response = self.client.post(self.url_cooperate + self.url_have_i_sent, {'pk': self.patient.id})
+        self.assertEqual(first_response.data['go_to_doctor_list'], False)
+        self.client.post(self.url_cooperate + self.url_rejected, {'pk': first_response.data['id']})
+        second_response = self.client.post(self.url_cooperate + self.url_have_i_sent, {'pk': self.patient.id})
+        self.assertEqual(second_response.data, {'go_to_doctor_list': True})
