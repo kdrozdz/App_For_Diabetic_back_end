@@ -3,7 +3,10 @@ from accounts.models import Account
 from rest_framework import viewsets, status
 from rest_framework.authentication import TokenAuthentication
 from Api.Serializers import AccountCreateSerializer, AccountGetSerializer, PatientListSerializer, \
-    PatientDetailSerializer, CooperateSerializer, DoctorGetSerializer, SugarLevelCreateSerializer, SugarLevelListSerializer, SugarLevelGetSerializer
+    PatientDetailSerializer, DoctorGetSerializer, SugarLevelCreateSerializer, \
+    SugarLevelListSerializer, CooperateGetSerializer, SugarLevelGetSerializer, DoctorListSerializer, AccountListSerializer, \
+    CooperateCreateSerializer
+
 from Api.models import Patient, Doctor, Cooperate, SugarLevel
 from rest_framework.permissions import IsAuthenticated, AllowAny
 from rest_framework.authtoken.views import ObtainAuthToken
@@ -78,18 +81,33 @@ class PatientViewSet(viewsets.ModelViewSet):
 
 class CooperateViewSet(viewsets.ModelViewSet):
     queryset = Cooperate.objects.all()
-    serializer_class = CooperateSerializer
+    serializer_class = CooperateCreateSerializer
     permission_classes = (IsAuthenticated,)
     authentication_classes = (TokenAuthentication,)
 
-    def update(self, request, *args, **kwargs):
-        cooperate_realation = self.get_object()
+    # def update(self, request, *args, **kwargs):
+    #     cooperate_realation = self.get_object()
+    #
+    #     if cooperate_realation.accept_sender and cooperate_realation.accept_reciver:
+    #         cooperate_realation.is_active = True
+    #
+    #     if cooperate_realation.rejected:
+    #         cooperate_realation.is_active = False
 
-        if cooperate_realation.accept_sender and cooperate_realation.accept_reciver:
-            cooperate_realation.is_active = True
+    @action(detail=False, methods=['post'])
+    def have_i_sent_cooperate(self, request):
+        if Cooperate.objects.filter(patient=request.data['pk']).filter(rejected=False).exists():
+            response_obj = CooperateGetSerializer(Cooperate.objects.get(patient=request.data['pk'], rejected=False), many=False).data
+            response_obj['go_to_doctor_list'] = False
+            return Response(response_obj)
+        return Response({'go_to_doctor_list': True})
 
-        if cooperate_realation.rejected:
-            cooperate_realation.is_active = False
+    @action(detail=False, methods=['post'])
+    def reject_cooperate(self, request):
+        cooperte_obj = Cooperate.objects.get(id=request.data['pk'])
+        cooperte_obj.rejected = True
+        cooperte_obj.save()
+        return Response(status.HTTP_200_OK)
 
 
 class DoctorViewSet(viewsets.ModelViewSet):
@@ -102,6 +120,10 @@ class DoctorViewSet(viewsets.ModelViewSet):
         doctor = Doctor.objects.get(account_id=request.data['pk'])
         return Response(DoctorGetSerializer(doctor).data)
 
+    def get_serializer_class(self):
+        if self.action == 'list':
+            return DoctorListSerializer
+
 
 class SugarLeveViewSet(viewsets.ModelViewSet):
     queryset = SugarLevel.objects.all()
@@ -112,7 +134,7 @@ class SugarLeveViewSet(viewsets.ModelViewSet):
     @action(detail=False, methods=['post'])
     def all_info(self, request):
         sugars = SugarLevel.objects.filter(account_id=request.data['pk']).order_by('-date')
-        fast_blood_sugars = [sugar.level for sugar in sugars if sugar.without_a_meal == True]
+        fast_blood_sugars = [sugar.level for sugar in sugars if sugar.without_a_meal is True]
 
         serializer_list_all = SugarLevelGetSerializer(sugars, many=True)
         avreage_all_sugars = round(sum([sugar.level for sugar in sugars])/len(sugars)) if len(sugars) > 0 else 0
