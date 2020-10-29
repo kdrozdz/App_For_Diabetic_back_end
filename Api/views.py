@@ -74,6 +74,11 @@ class PatientViewSet(viewsets.ModelViewSet):
     permission_classes = (IsAuthenticated,)
     authentication_classes = (TokenAuthentication,)
 
+    def list(self, request, *args, **kwargs):
+
+        serializer=PatientListSerializer(Patient.objects.filter(doctor=None),many=True)
+        return Response(serializer.data)
+
     def get_serializer_class(self):
         if self.action == 'retrieve':
             return PatientDetailSerializer

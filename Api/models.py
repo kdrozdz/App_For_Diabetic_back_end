@@ -11,7 +11,7 @@ class SugarLevel(models.Model):
 
 class Patient(models.Model):
     account = models.OneToOneField(Account, on_delete=models.CASCADE, related_name='patient')
-    doctor = models.ForeignKey('Doctor', on_delete=models.CASCADE, null=True, related_name='patient')
+    doctor = models.ForeignKey('Doctor', on_delete=models.CASCADE, null=True, blank=True, related_name='patient')
 
     def __str__(self):
         return f'{self.account.email} {self.account}'
