@@ -117,6 +117,14 @@ class CooperateViewSet(viewsets.ModelViewSet):
         cooperte_obj.save()
         return Response(status.HTTP_200_OK)
 
+    @action(detail=False, methods=['post'])
+    def activate(self, request):
+        cooperte_obj = Cooperate.objects.get(id=request.data['pk'])
+        cooperte_obj.is_active = True
+        cooperte_obj.save()
+        return Response(status.HTTP_200_OK)
+
+
 
 class DoctorViewSet(viewsets.ModelViewSet):
     queryset = Doctor.objects.all()

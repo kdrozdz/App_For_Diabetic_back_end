@@ -68,7 +68,7 @@ class CooperateGetSerializer(serializers.ModelSerializer):
     patient = AccountGetSerializer(many=False)
     class Meta:
         model = Cooperate
-        fields = ['doctor', 'patient', 'message', 'date', 'id']
+        fields = ['doctor', 'patient', 'message', 'date', 'id', 'is_active']
 
 
 class CooperateNewSerializer(serializers.ModelSerializer):
