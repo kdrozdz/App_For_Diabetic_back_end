@@ -3,8 +3,7 @@ from accounts.models import Account
 from rest_framework import viewsets, status
 from rest_framework.authentication import TokenAuthentication
 from Api.Serializers import AccountCreateSerializer, AccountGetSerializer, PatientListSerializer, \
-    PatientDetailSerializer, DoctorGetSerializer, SugarLevelCreateSerializer, \
-    SugarLevelListSerializer, CooperateGetSerializer, SugarLevelGetSerializer, DoctorListSerializer, AccountListSerializer, \
+    PatientDetailSerializer, DoctorGetSerializer, SugarLevelCreateSerializer, CooperateNewSerializer, CooperateGetSerializer, SugarLevelGetSerializer, DoctorListSerializer, AccountListSerializer, \
     CooperateCreateSerializer
 
 from Api.models import Patient, Doctor, Cooperate, SugarLevel
@@ -75,7 +74,6 @@ class PatientViewSet(viewsets.ModelViewSet):
     authentication_classes = (TokenAuthentication,)
 
     def list(self, request, *args, **kwargs):
-
         serializer=PatientListSerializer(Patient.objects.filter(doctor=None),many=True)
         return Response(serializer.data)
 
@@ -98,6 +96,11 @@ class CooperateViewSet(viewsets.ModelViewSet):
     #
     #     if cooperate_realation.rejected:
     #         cooperate_realation.is_active = False
+
+    @action(detail=False, methods=['post'])
+    def my_new_cooperate(self, request):
+        out_put = CooperateNewSerializer(Cooperate.objects.filter(doctor__id=request.data['pk'], rejected=False, is_active=False), many=True).data
+        return Response(out_put)
 
     @action(detail=False, methods=['post'])
     def have_i_sent_cooperate(self, request):
