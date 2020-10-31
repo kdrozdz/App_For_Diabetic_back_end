@@ -73,29 +73,23 @@ class PatientViewSet(viewsets.ModelViewSet):
     permission_classes = (IsAuthenticated,)
     authentication_classes = (TokenAuthentication,)
 
-    def list(self, request, *args, **kwargs):
-        serializer=PatientListSerializer(Patient.objects.filter(doctor=None),many=True)
-        return Response(serializer.data)
-
     def get_serializer_class(self):
         if self.action == 'retrieve':
             return PatientDetailSerializer
+        else:
+            return  PatientListSerializer
 
+    @action(detail=False, methods=['post'])
+    def my_patient(self, request):
+        patients = Patient.objects.filter(doctor=Doctor.objects.get(account__id=request.data['pk']).id)
+        out_put = PatientListSerializer(patients, many=True).data
+        return Response(out_put)
 
 class CooperateViewSet(viewsets.ModelViewSet):
     queryset = Cooperate.objects.all()
     serializer_class = CooperateCreateSerializer
     permission_classes = (IsAuthenticated,)
     authentication_classes = (TokenAuthentication,)
-
-    # def update(self, request, *args, **kwargs):
-    #     cooperate_realation = self.get_object()
-    #
-    #     if cooperate_realation.accept_sender and cooperate_realation.accept_reciver:
-    #         cooperate_realation.is_active = True
-    #
-    #     if cooperate_realation.rejected:
-    #         cooperate_realation.is_active = False
 
     @action(detail=False, methods=['post'])
     def my_new_cooperate(self, request):
@@ -121,9 +115,12 @@ class CooperateViewSet(viewsets.ModelViewSet):
     def activate(self, request):
         cooperte_obj = Cooperate.objects.get(id=request.data['pk'])
         cooperte_obj.is_active = True
+        patient = Patient.objects.get(account_id=cooperte_obj.patient.id)
+        doctor = Doctor.objects.get(account_id=cooperte_obj.doctor.id)
+        patient.doctor = doctor
+        patient.save()
         cooperte_obj.save()
         return Response(status.HTTP_200_OK)
-
 
 
 class DoctorViewSet(viewsets.ModelViewSet):
