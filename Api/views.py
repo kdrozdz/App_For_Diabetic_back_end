@@ -153,7 +153,6 @@ class SugarLeveViewSet(viewsets.ModelViewSet):
         avreage_all_sugars = round(sum([sugar.level for sugar in sugars])/len(sugars)) if len(sugars) > 0 else 0
         avreage_last_five_sugars = round(sum([sugar.level for sugar in sugars[:5]])/len(sugars[:5])) if len(sugars[:5]) > 0 else 0
         avreage_all_fast_blood_sugar = round(sum(fast_blood_sugars)/len(fast_blood_sugars)) if len(fast_blood_sugars) > 0 else 0
-
         out_put = {
             'list_of_all_sugars': serializer_list_all.data,
             'avreage_all_sugars': avreage_all_sugars,
