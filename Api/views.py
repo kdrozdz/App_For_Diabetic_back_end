@@ -119,6 +119,17 @@ class CooperateViewSet(viewsets.ModelViewSet):
         return Response(status.HTTP_200_OK)
 
     @action(detail=False, methods=['post'])
+    def remove_cooperate(self, request):
+        cooperte_obj = Cooperate.objects.get(id=request.data['pk'])
+        patient = Patient.objects.get(account=cooperte_obj.patient.id)
+        patient.doctor = None
+        cooperte_obj.rejected = True
+        cooperte_obj.is_active = False
+        cooperte_obj.save()
+        patient.save()
+        return Response(status.HTTP_200_OK)
+
+    @action(detail=False, methods=['post'])
     def reject_cooperate(self, request):
         cooperte_obj = Cooperate.objects.get(id=request.data['pk'])
         cooperte_obj.rejected = True
