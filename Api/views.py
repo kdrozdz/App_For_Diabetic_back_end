@@ -92,6 +92,13 @@ class CooperateViewSet(viewsets.ModelViewSet):
     authentication_classes = (TokenAuthentication,)
 
     @action(detail=False, methods=['post'])
+    def get_cooperate(self, request):
+
+        out_put = CooperateGetSerializer(
+            Cooperate.objects.get(doctor__id=request.data['pk_doctor'],patient__id=request.data['pk_patient'], is_active=True), many=False).data
+        return Response(out_put)
+
+    @action(detail=False, methods=['post'])
     def my_new_cooperate(self, request):
         out_put = CooperateNewSerializer(Cooperate.objects.filter(doctor__id=request.data['pk'], rejected=False, is_active=False), many=True).data
         return Response(out_put)
@@ -105,6 +112,13 @@ class CooperateViewSet(viewsets.ModelViewSet):
         return Response({'go_to_doctor_list': True})
 
     @action(detail=False, methods=['post'])
+    def reject_cooperate_msg(self, request):
+        cooperte_obj = Cooperate.objects.get(id=request.data['pk'])
+        cooperte_obj.show_rejected_first_time = True
+        cooperte_obj.save()
+        return Response(status.HTTP_200_OK)
+
+    @action(detail=False, methods=['post'])
     def reject_cooperate(self, request):
         cooperte_obj = Cooperate.objects.get(id=request.data['pk'])
         cooperte_obj.rejected = True
@@ -115,8 +129,10 @@ class CooperateViewSet(viewsets.ModelViewSet):
     def activate(self, request):
         cooperte_obj = Cooperate.objects.get(id=request.data['pk'])
         cooperte_obj.is_active = True
-        patient = Patient.objects.get(account_id=cooperte_obj.patient.id)
-        doctor = Doctor.objects.get(account_id=cooperte_obj.doctor.id)
+        cooperte_obj.accept_doctor = True
+        patient = Patient.objects.get(account=cooperte_obj.patient.id)
+        doctor = Doctor.objects.get(account=cooperte_obj.doctor.id)
+
         patient.doctor = doctor
         patient.save()
         cooperte_obj.save()

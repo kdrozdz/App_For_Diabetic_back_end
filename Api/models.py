@@ -30,6 +30,7 @@ class Cooperate(models.Model):
     accept_patient = models.BooleanField(default=False)
     accept_doctor = models.BooleanField(default=False)
     is_active = models.BooleanField(default=False)
+    show_rejected_first_time = models.BooleanField(default=False)
     rejected = models.BooleanField(default=False)
     message = models.TextField(max_length=256, blank=True)
     date = models.DateTimeField(auto_now_add=True)
