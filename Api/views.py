@@ -5,7 +5,7 @@ from rest_framework.authentication import TokenAuthentication
 from Api.Serializers import AccountCreateSerializer, AccountGetSerializer, PatientListSerializer, \
     PatientDetailSerializer, DoctorGetSerializer, SugarLevelCreateSerializer, CooperateNewSerializer, \
     CooperateGetSerializer, SugarLevelGetSerializer, DoctorListSerializer, \
-    CooperateCreateSerializer, AdviceCreateSerializer
+    CooperateCreateSerializer, AdviceCreateSerializer, AdviceListSerializer
 
 from Api.models import Patient, Doctor, Cooperate, SugarLevel, Advice
 from rest_framework.permissions import IsAuthenticated, AllowAny
@@ -86,6 +86,9 @@ class PatientViewSet(viewsets.ModelViewSet):
         out_put = PatientListSerializer(patients, many=True).data
         return Response(out_put)
 
+    def retrieve(self, request, *args, **kwargs):
+        serialzier= PatientDetailSerializer(Patient.objects.get(account=kwargs['pk']), many=False).data
+        return Response(serialzier, status=status.HTTP_200_OK)
 
 class CooperateViewSet(viewsets.ModelViewSet):
     queryset = Cooperate.objects.all()
@@ -208,6 +211,11 @@ class AdviceViewSet(viewsets.ModelViewSet):
     def create(self, request):
         super(AdviceViewSet, self).create(request)
         return Response(status=status.HTTP_201_CREATED)
+
+    @action(detail=False, methods=['post'])
+    def for_patient(self,request):
+        serializer = AdviceListSerializer(Advice.objects.filter(patient=request.data['pk']),many=True).data
+        return Response(serializer)
 
 # sender = models.ForeignKey(Account, related_name='user_sender_cooperate', on_delete=models.DO_NOTHING)
 # reciver = models.ForeignKey(Account, related_name='user_reciver_cooperate', on_delete=models.DO_NOTHING)

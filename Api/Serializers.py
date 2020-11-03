@@ -111,3 +111,8 @@ class AdviceCreateSerializer(serializers.ModelSerializer):
     class Meta:
         model = Advice
         fields = '__all__'
+
+class AdviceListSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = Advice
+        exclude = ['patient','doctor',]
