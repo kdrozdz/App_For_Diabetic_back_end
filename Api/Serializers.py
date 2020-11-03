@@ -1,6 +1,6 @@
 from rest_framework import serializers
 from accounts.models import Account
-from Api.models import Patient, Doctor, SugarLevel, Chat, Cooperate
+from Api.models import Patient, Doctor, SugarLevel, Chat, Cooperate, Advice
 
 
 class AccountCreateSerializer(serializers.ModelSerializer):
@@ -104,4 +104,10 @@ class SugarLevelCreateSerializer(serializers.ModelSerializer):
 class ChatSerializer(serializers.ModelSerializer):
     class Meta:
         model = Chat
+        fields = '__all__'
+
+
+class AdviceCreateSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = Advice
         fields = '__all__'

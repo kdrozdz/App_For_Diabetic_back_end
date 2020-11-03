@@ -42,3 +42,14 @@ class Chat(models.Model):
     is_new = models.BooleanField(default=True)
     create_time = models.DateTimeField(auto_now_add=True)
     msg = models.TextField()
+
+
+class Advice(models.Model):
+    patient = models.ForeignKey(Account, related_name='patient_advice', on_delete=models.DO_NOTHING)
+    doctor = models.ForeignKey(Account, related_name='doctor_advice', on_delete=models.DO_NOTHING)
+    message = models.TextField(max_length=512)
+    is_new = models.BooleanField(default=True)
+    date = models.DateTimeField(auto_now_add=True)
+
+
+

@@ -3,10 +3,11 @@ from accounts.models import Account
 from rest_framework import viewsets, status
 from rest_framework.authentication import TokenAuthentication
 from Api.Serializers import AccountCreateSerializer, AccountGetSerializer, PatientListSerializer, \
-    PatientDetailSerializer, DoctorGetSerializer, SugarLevelCreateSerializer, CooperateNewSerializer, CooperateGetSerializer, SugarLevelGetSerializer, DoctorListSerializer, AccountListSerializer, \
-    CooperateCreateSerializer
+    PatientDetailSerializer, DoctorGetSerializer, SugarLevelCreateSerializer, CooperateNewSerializer, \
+    CooperateGetSerializer, SugarLevelGetSerializer, DoctorListSerializer, \
+    CooperateCreateSerializer, AdviceCreateSerializer
 
-from Api.models import Patient, Doctor, Cooperate, SugarLevel
+from Api.models import Patient, Doctor, Cooperate, SugarLevel, Advice
 from rest_framework.permissions import IsAuthenticated, AllowAny
 from rest_framework.authtoken.views import ObtainAuthToken
 from rest_framework.authtoken.models import Token
@@ -77,13 +78,14 @@ class PatientViewSet(viewsets.ModelViewSet):
         if self.action == 'retrieve':
             return PatientDetailSerializer
         else:
-            return  PatientListSerializer
+            return PatientListSerializer
 
     @action(detail=False, methods=['post'])
     def my_patient(self, request):
         patients = Patient.objects.filter(doctor=Doctor.objects.get(account__id=request.data['pk']).id)
         out_put = PatientListSerializer(patients, many=True).data
         return Response(out_put)
+
 
 class CooperateViewSet(viewsets.ModelViewSet):
     queryset = Cooperate.objects.all()
@@ -93,20 +95,22 @@ class CooperateViewSet(viewsets.ModelViewSet):
 
     @action(detail=False, methods=['post'])
     def get_cooperate(self, request):
-
         out_put = CooperateGetSerializer(
-            Cooperate.objects.get(doctor__id=request.data['pk_doctor'],patient__id=request.data['pk_patient'], is_active=True), many=False).data
+            Cooperate.objects.get(doctor__id=request.data['pk_doctor'], patient__id=request.data['pk_patient'],
+                                  is_active=True), many=False).data
         return Response(out_put)
 
     @action(detail=False, methods=['post'])
     def my_new_cooperate(self, request):
-        out_put = CooperateNewSerializer(Cooperate.objects.filter(doctor__id=request.data['pk'], rejected=False, is_active=False), many=True).data
+        out_put = CooperateNewSerializer(
+            Cooperate.objects.filter(doctor__id=request.data['pk'], rejected=False, is_active=False), many=True).data
         return Response(out_put)
 
     @action(detail=False, methods=['post'])
     def have_i_sent_cooperate(self, request):
         if Cooperate.objects.filter(patient=request.data['pk']).filter(rejected=False).exists():
-            response_obj = CooperateGetSerializer(Cooperate.objects.get(patient=request.data['pk'], rejected=False), many=False).data
+            response_obj = CooperateGetSerializer(Cooperate.objects.get(patient=request.data['pk'], rejected=False),
+                                                  many=False).data
             response_obj['go_to_doctor_list'] = False
             return Response(response_obj)
         return Response({'go_to_doctor_list': True})
@@ -170,16 +174,22 @@ class SugarLeveViewSet(viewsets.ModelViewSet):
     serializer_class = SugarLevelCreateSerializer
     permission_classes = (IsAuthenticated,)
     authentication_classes = (TokenAuthentication,)
-
+    
+    def create(self, request):
+        super(SugarLeveViewSet, self).create(request)
+        return Response(status=status.HTTP_201_CREATED)
+    
     @action(detail=False, methods=['post'])
     def all_info(self, request):
         sugars = SugarLevel.objects.filter(account_id=request.data['pk']).order_by('-date')
         fast_blood_sugars = [sugar.level for sugar in sugars if sugar.without_a_meal is True]
 
         serializer_list_all = SugarLevelGetSerializer(sugars, many=True)
-        avreage_all_sugars = round(sum([sugar.level for sugar in sugars])/len(sugars)) if len(sugars) > 0 else 0
-        avreage_last_five_sugars = round(sum([sugar.level for sugar in sugars[:5]])/len(sugars[:5])) if len(sugars[:5]) > 0 else 0
-        avreage_all_fast_blood_sugar = round(sum(fast_blood_sugars)/len(fast_blood_sugars)) if len(fast_blood_sugars) > 0 else 0
+        avreage_all_sugars = round(sum([sugar.level for sugar in sugars]) / len(sugars)) if len(sugars) > 0 else 0
+        avreage_last_five_sugars = round(sum([sugar.level for sugar in sugars[:5]]) / len(sugars[:5])) if len(
+            sugars[:5]) > 0 else 0
+        avreage_all_fast_blood_sugar = round(sum(fast_blood_sugars) / len(fast_blood_sugars)) if len(
+            fast_blood_sugars) > 0 else 0
         out_put = {
             'list_of_all_sugars': serializer_list_all.data,
             'avreage_all_sugars': avreage_all_sugars,
@@ -187,55 +197,66 @@ class SugarLeveViewSet(viewsets.ModelViewSet):
             'avreage_all_fast_blood_sugar': avreage_all_fast_blood_sugar,
         }
         return Response(out_put)
+    
 
-        # sender = models.ForeignKey(Account, related_name='user_sender_cooperate', on_delete=models.DO_NOTHING)
-        # reciver = models.ForeignKey(Account, related_name='user_reciver_cooperate', on_delete=models.DO_NOTHING)
-        # accept_sender = models.BooleanField(default=False)
-        # accept_reciver = models.BooleanField(default=False)
-        # is_active = models.BooleanField(default=False)
-    # def all_sugar(self):
-    #     all_sugar = [x for x in Sugar_level.objects.filter(patient=self)]
-    #     if len(all_sugar) > 0:
-    #         return all_sugar
-    #
-    # def avg_sugar(self):
-    #     all_lvl = [x.level for x in Sugar_level.objects.filter(patient=self)]
-    #     if len(all_lvl) > 0:
-    #         avg_all = round((sum(all_lvl) / len(all_lvl)))
-    #         return avg_all
-    #     else:
-    #         return 'Nie ma wyników'
-    #
-    # def avg_sugar_10(self):
-    #     sugar_10 = Sugar_level.objects.filter(patient=self).order_by('-date')[:10]
-    #     all_lvl = [x.level for x in sugar_10]
-    #
-    #     if len(all_lvl) > 0:
-    #         avg_10 = round((sum(all_lvl) / len(all_lvl)))
-    #         return avg_10
-    #     else:
-    #         return 'Nie ma wyników'
-    #
-    # def retrieve(self, request, pk=None, **kwargs):
-    #     try:
-    #         serializer = PatientSerializer(Patient.objects.get(user_id=pk))
-    #         return Response(serializer.data)
-    #     except:
-    #         return Response("")
-    #
-    # @action(detail=True, methods=['post'])
-    # def sugar(self, request, pk=None, **kwargs):
-    #     patient = Patient.objects.get(user_id=pk)
-    #     new_sugar = Sugar_level.objects.create(patient=patient,
-    #                                            level=request.data['level'],
-    #                                            without_a_meal=request.data['without_a_meal'])
-    #     serializer = SugarLevelSerializer(new_sugar.save(), many=False)
-    #     return Response(serializer.data)
-    #
-    # def list(self, request, *args, **kwargs):
-    #     pateint = Patient.objects.filter(doctor=None)
-    #     serializer = PatientDetailsSerializer(pateint, many=True)
-    #     return Response(serializer.data)
+class AdviceViewSet(viewsets.ModelViewSet):
+    queryset = Advice.objects.all()
+    serializer_class = AdviceCreateSerializer
+    permission_classes = (IsAuthenticated,)
+    authentication_classes = (TokenAuthentication,)
+
+    def create(self, request):
+        super(AdviceViewSet, self).create(request)
+        return Response(status=status.HTTP_201_CREATED)
+
+# sender = models.ForeignKey(Account, related_name='user_sender_cooperate', on_delete=models.DO_NOTHING)
+# reciver = models.ForeignKey(Account, related_name='user_reciver_cooperate', on_delete=models.DO_NOTHING)
+# accept_sender = models.BooleanField(default=False)
+# accept_reciver = models.BooleanField(default=False)
+# is_active = models.BooleanField(default=False)
+# def all_sugar(self):
+#     all_sugar = [x for x in Sugar_level.objects.filter(patient=self)]
+#     if len(all_sugar) > 0:
+#         return all_sugar
+#
+# def avg_sugar(self):
+#     all_lvl = [x.level for x in Sugar_level.objects.filter(patient=self)]
+#     if len(all_lvl) > 0:
+#         avg_all = round((sum(all_lvl) / len(all_lvl)))
+#         return avg_all
+#     else:
+#         return 'Nie ma wyników'
+#
+# def avg_sugar_10(self):
+#     sugar_10 = Sugar_level.objects.filter(patient=self).order_by('-date')[:10]
+#     all_lvl = [x.level for x in sugar_10]
+#
+#     if len(all_lvl) > 0:
+#         avg_10 = round((sum(all_lvl) / len(all_lvl)))
+#         return avg_10
+#     else:
+#         return 'Nie ma wyników'
+#
+# def retrieve(self, request, pk=None, **kwargs):
+#     try:
+#         serializer = PatientSerializer(Patient.objects.get(user_id=pk))
+#         return Response(serializer.data)
+#     except:
+#         return Response("")
+#
+# @action(detail=True, methods=['post'])
+# def sugar(self, request, pk=None, **kwargs):
+#     patient = Patient.objects.get(user_id=pk)
+#     new_sugar = Sugar_level.objects.create(patient=patient,
+#                                            level=request.data['level'],
+#                                            without_a_meal=request.data['without_a_meal'])
+#     serializer = SugarLevelSerializer(new_sugar.save(), many=False)
+#     return Response(serializer.data)
+#
+# def list(self, request, *args, **kwargs):
+#     pateint = Patient.objects.filter(doctor=None)
+#     serializer = PatientDetailsSerializer(pateint, many=True)
+#     return Response(serializer.data)
 
 # class DoctorViewSet(viewsets.ModelViewSet):
 
