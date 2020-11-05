@@ -30,6 +30,7 @@ class Cooperate(models.Model):
     accept_patient = models.BooleanField(default=False)
     accept_doctor = models.BooleanField(default=False)
     is_active = models.BooleanField(default=False)
+    show_rejected_first_time = models.BooleanField(default=False)
     rejected = models.BooleanField(default=False)
     message = models.TextField(max_length=256, blank=True)
     date = models.DateTimeField(auto_now_add=True)
@@ -41,3 +42,14 @@ class Chat(models.Model):
     is_new = models.BooleanField(default=True)
     create_time = models.DateTimeField(auto_now_add=True)
     msg = models.TextField()
+
+
+class Advice(models.Model):
+    patient = models.ForeignKey(Account, related_name='patient_advice', on_delete=models.DO_NOTHING)
+    doctor = models.ForeignKey(Account, related_name='doctor_advice', on_delete=models.DO_NOTHING)
+    message = models.TextField(max_length=512)
+    is_new = models.BooleanField(default=True)
+    date = models.DateTimeField(auto_now_add=True)
+
+
+

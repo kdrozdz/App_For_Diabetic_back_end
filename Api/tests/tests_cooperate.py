@@ -1,6 +1,6 @@
 from rest_framework import status
 from rest_framework.test import APITestCase
-from Api.models import SugarLevel
+from Api.models import Patient, Doctor
 from Api.tests.data import Init
 from accounts.models import Account
 from rest_framework.authtoken.models import Token
