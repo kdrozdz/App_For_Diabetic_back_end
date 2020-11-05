@@ -127,7 +127,7 @@ class CooperateViewSet(viewsets.ModelViewSet):
 
     @action(detail=False, methods=['post'])
     def remove_cooperate(self, request):
-        cooperte_obj = Cooperate.objects.get(id=request.data['pk'])
+        cooperte_obj = Cooperate.objects.get(id=int(request.data['pk']))
         patient = Patient.objects.get(account=cooperte_obj.patient.id)
         patient.doctor = None
         cooperte_obj.rejected = True
@@ -145,15 +145,14 @@ class CooperateViewSet(viewsets.ModelViewSet):
 
     @action(detail=False, methods=['post'])
     def activate(self, request):
-        cooperte_obj = Cooperate.objects.get(id=request.data['pk'])
-        cooperte_obj.is_active = True
-        cooperte_obj.accept_doctor = True
-        patient = Patient.objects.get(account=cooperte_obj.patient.id)
-        doctor = Doctor.objects.get(account=cooperte_obj.doctor.id)
-
+        cooperate_obj = Cooperate.objects.get(id=request.data['pk'])
+        cooperate_obj.is_active = True
+        cooperate_obj.accept_doctor = True
+        doctor = Doctor.objects.get(account=cooperate_obj.doctor.id)
+        patient = Patient.objects.get(account=cooperate_obj.patient.id)
         patient.doctor = doctor
         patient.save()
-        cooperte_obj.save()
+        cooperate_obj.save()
         return Response(status.HTTP_200_OK)
 
 
