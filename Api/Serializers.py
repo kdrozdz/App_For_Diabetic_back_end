@@ -45,15 +45,11 @@ class PatientDetailSerializer(PatientListSerializer):
 
 class DoctorGetSerializer(serializers.ModelSerializer):
     account = AccountGetSerializer(many=False)
-    # patients = serializers.SerializerMethodField('get_patient')
 
     class Meta:
         model = Doctor
         fields = 'account',
 
-    # def get_patients(self):
-    #     out_put = PatientListSerializer(self.objects.patient.all(),many=True).data
-    #     return out_put
 
 class DoctorListSerializer(serializers.ModelSerializer):
     account = AccountListSerializer(many=False)

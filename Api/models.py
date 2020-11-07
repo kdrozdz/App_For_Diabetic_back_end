@@ -37,11 +37,12 @@ class Cooperate(models.Model):
 
 
 class Chat(models.Model):
-    sender = models.ForeignKey(Account, related_name='user_sender_email', on_delete=models.DO_NOTHING)
-    reciver = models.ForeignKey(Account, related_name='user_reciver_email', on_delete=models.DO_NOTHING)
+    sender = models.ForeignKey(Account, related_name='sender', on_delete=models.DO_NOTHING)
+    doctorId = models.ForeignKey(Account, related_name='user_sender_email', on_delete=models.DO_NOTHING)
+    patientId = models.ForeignKey(Account, related_name='user_reciver_email', on_delete=models.DO_NOTHING)
     is_new = models.BooleanField(default=True)
-    create_time = models.DateTimeField(auto_now_add=True)
-    msg = models.TextField()
+    date = models.DateTimeField(auto_now_add=True)
+    message = models.TextField()
 
 
 class Advice(models.Model):
@@ -50,6 +51,7 @@ class Advice(models.Model):
     message = models.TextField(max_length=512)
     is_new = models.BooleanField(default=True)
     date = models.DateTimeField(auto_now_add=True)
+
 
 
 

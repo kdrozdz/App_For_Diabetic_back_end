@@ -5,9 +5,9 @@ from rest_framework.authentication import TokenAuthentication
 from Api.Serializers import AccountCreateSerializer, AccountGetSerializer, PatientListSerializer, \
     PatientDetailSerializer, DoctorGetSerializer, SugarLevelCreateSerializer, CooperateNewSerializer, \
     CooperateGetSerializer, SugarLevelGetSerializer, DoctorListSerializer, \
-    CooperateCreateSerializer, AdviceCreateSerializer, AdviceListSerializer
+    CooperateCreateSerializer, AdviceCreateSerializer, AdviceListSerializer, ChatSerializer
 
-from Api.models import Patient, Doctor, Cooperate, SugarLevel, Advice
+from Api.models import Patient, Doctor, Cooperate, SugarLevel, Advice, Chat
 from rest_framework.permissions import IsAuthenticated, AllowAny
 from rest_framework.authtoken.views import ObtainAuthToken
 from rest_framework.authtoken.models import Token
@@ -216,96 +216,26 @@ class AdviceViewSet(viewsets.ModelViewSet):
         serializer = AdviceListSerializer(Advice.objects.filter(patient=request.data['pk']),many=True).data
         return Response(serializer)
 
-# sender = models.ForeignKey(Account, related_name='user_sender_cooperate', on_delete=models.DO_NOTHING)
-# reciver = models.ForeignKey(Account, related_name='user_reciver_cooperate', on_delete=models.DO_NOTHING)
-# accept_sender = models.BooleanField(default=False)
-# accept_reciver = models.BooleanField(default=False)
-# is_active = models.BooleanField(default=False)
-# def all_sugar(self):
-#     all_sugar = [x for x in Sugar_level.objects.filter(patient=self)]
-#     if len(all_sugar) > 0:
-#         return all_sugar
-#
-# def avg_sugar(self):
-#     all_lvl = [x.level for x in Sugar_level.objects.filter(patient=self)]
-#     if len(all_lvl) > 0:
-#         avg_all = round((sum(all_lvl) / len(all_lvl)))
-#         return avg_all
-#     else:
-#         return 'Nie ma wyników'
-#
-# def avg_sugar_10(self):
-#     sugar_10 = Sugar_level.objects.filter(patient=self).order_by('-date')[:10]
-#     all_lvl = [x.level for x in sugar_10]
-#
-#     if len(all_lvl) > 0:
-#         avg_10 = round((sum(all_lvl) / len(all_lvl)))
-#         return avg_10
-#     else:
-#         return 'Nie ma wyników'
-#
-# def retrieve(self, request, pk=None, **kwargs):
-#     try:
-#         serializer = PatientSerializer(Patient.objects.get(user_id=pk))
-#         return Response(serializer.data)
-#     except:
-#         return Response("")
-#
-# @action(detail=True, methods=['post'])
-# def sugar(self, request, pk=None, **kwargs):
-#     patient = Patient.objects.get(user_id=pk)
-#     new_sugar = Sugar_level.objects.create(patient=patient,
-#                                            level=request.data['level'],
-#                                            without_a_meal=request.data['without_a_meal'])
-#     serializer = SugarLevelSerializer(new_sugar.save(), many=False)
-#     return Response(serializer.data)
-#
-# def list(self, request, *args, **kwargs):
-#     pateint = Patient.objects.filter(doctor=None)
-#     serializer = PatientDetailsSerializer(pateint, many=True)
-#     return Response(serializer.data)
+class ChatViewSet(viewsets.ModelViewSet):
+    queryset = Chat.objects.all()
+    serializer_class = ChatSerializer
+    permission_classes = (IsAuthenticated,)
+    authentication_classes = (TokenAuthentication,)
 
-# class DoctorViewSet(viewsets.ModelViewSet):
+    @action(detail=False, methods=['post'])
+    def conversation(self, request):
+        patientId = request.data['patientId']
+        doctorId = request.data['doctorId']
 
-#     @action(detail=True)
-#     def my_patients(self, request, *args, pk=None, **kwargs):
-#         patients = Patient.objects.filter(doctor__user=pk)
-#         serializer = PatientDetailsSerializer(patients, many=True)
-#         return Response(serializer.data)
-#
-#     @action(detail=False, methods=['post'])
-#     def rm_patient(self, request, *args, **kwargs):
-#         patient = Patient.objects.get(user=request.data.get('userId'))
-#         patient.doctor = None
-#         patient.save()
-#         return Response(None)
+        messages = [x for x in Chat.objects.all().order_by('-date')
+                if x.patientId.id == int(doctorId) and x.doctorId.id == int(patientId)
+                or x.patientId.id == int(patientId) and x.doctorId.id == int(doctorId)]
 
+        serializer = ChatSerializer(messages, many=True)
 
-#
-# class EmailViewSet(viewsets.ModelViewSet):
-#     queryset = Email.objects.all()
-#     serializer_class = EmailSerializer
-#     permission_classes = (IsAuthenticated,)
-#     authentication_classes = (TokenAuthentication,)
-#
-#     def update(self, request, *args, **kwargs):
-#         msg = self.get_object()
-#         msg.is_new = request.data.get('is_new')
-#         msg.save()
-#         return Response("ok")
-#
-#     @action(detail=False, methods=['post'])
-#     def conv(self, request, *args, **kwargs):
-#         rec = request.data['rId']
-#         send = request.data['sId']
-#         msg = [x for x in Email.objects.all().order_by('-create_time')
-#                 if x.sender.id == int(send) and x.reciver.id == int(rec)
-#                 or x.sender.id == int(rec) and x.reciver.id == int(send)]
-#         serializer = EmailSerializer(msg, many=True)
-#         return Response(serializer.data)
-#
-#     @action(detail=False, methods=['post'])
-#     def new_msg(self, request, *args, **kwargs):
-#         msg = Email.objects.filter(reciver=request.data['rId']).filter(is_new=True)
-#         serializer = EmailSerializer(msg, many=True)
-#         return Response(serializer.data)
+        return Response(serializer.data)
+    # @action(detail=False, methods=['post'])
+    # def new_msg(self, request, *args, **kwargs):
+    #     msg = Email.objects.filter(reciver=request.data['rId']).filter(is_new=True)
+    #     serializer = EmailSerializer(msg, many=True)
+    #     return Response(serializer.data)
