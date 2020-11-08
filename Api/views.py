@@ -5,9 +5,9 @@ from rest_framework.authentication import TokenAuthentication
 from Api.Serializers import AccountCreateSerializer, AccountGetSerializer, PatientListSerializer, \
     PatientDetailSerializer, DoctorGetSerializer, SugarLevelCreateSerializer, CooperateNewSerializer, \
     CooperateGetSerializer, SugarLevelGetSerializer, DoctorListSerializer, \
-    CooperateCreateSerializer, AdviceCreateSerializer, AdviceListSerializer, ChatSerializer
+    CooperateCreateSerializer, AdviceCreateSerializer, AdviceListSerializer, ChatSerializer, RejectCooperateSerializer
 
-from Api.models import Patient, Doctor, Cooperate, SugarLevel, Advice, Chat
+from Api.models import Patient, Doctor, Cooperate, SugarLevel, Advice, Chat, RejectCooperate
 from rest_framework.permissions import IsAuthenticated, AllowAny
 from rest_framework.authtoken.views import ObtainAuthToken
 from rest_framework.authtoken.models import Token
@@ -118,12 +118,6 @@ class CooperateViewSet(viewsets.ModelViewSet):
             return Response(response_obj)
         return Response({'go_to_doctor_list': True})
 
-    @action(detail=False, methods=['post'])
-    def reject_cooperate_msg(self, request):
-        cooperte_obj = Cooperate.objects.get(id=request.data['pk'])
-        cooperte_obj.show_rejected_first_time = True
-        cooperte_obj.save()
-        return Response(status.HTTP_200_OK)
 
     @action(detail=False, methods=['post'])
     def remove_cooperate(self, request):
@@ -132,6 +126,19 @@ class CooperateViewSet(viewsets.ModelViewSet):
         patient.doctor = None
         cooperte_obj.rejected = True
         cooperte_obj.is_active = False
+
+        account_how_removed = Account.objects.get(id=request.data['how_removed'])
+        send_info_to = 0
+        if cooperte_obj.patient.id == request.data['how_removed']:
+            send_info_to = cooperte_obj.doctor.id
+        else:
+            send_info_to = cooperte_obj.patient.id
+        account_send_info_to = Account.objects.get(id=send_info_to)
+        new_reject_cooperate = RejectCooperate.objects.create(how_rejected=account_how_removed,
+                                                              message=f'Cooperate was rejected by {account_how_removed.email}',
+                                                              send_info_to=account_send_info_to)
+
+        new_reject_cooperate.save()
         cooperte_obj.save()
         patient.save()
         return Response(status.HTTP_200_OK)
@@ -140,6 +147,17 @@ class CooperateViewSet(viewsets.ModelViewSet):
     def reject_cooperate(self, request):
         cooperte_obj = Cooperate.objects.get(id=request.data['pk'])
         cooperte_obj.rejected = True
+        account_how_rejected = Account.objects.get(id=request.data['how_rejected'])
+        send_info_to = 0
+        if cooperte_obj.patient.id == request.data['how_rejected']:
+            send_info_to = cooperte_obj.doctor.id
+        else:
+            send_info_to = cooperte_obj.patient.id
+        account_send_info_to = Account.objects.get(id=send_info_to)
+        new_reject_cooperate = RejectCooperate.objects.create(how_rejected=account_how_rejected,
+                                                              message=f'Cooperate was rejected by {account_how_rejected.email}',
+                                                              send_info_to=account_send_info_to )
+        new_reject_cooperate.save()
         cooperte_obj.save()
         return Response(status.HTTP_200_OK)
 
@@ -154,6 +172,18 @@ class CooperateViewSet(viewsets.ModelViewSet):
         patient.save()
         cooperate_obj.save()
         return Response(status.HTTP_200_OK)
+
+class RejectCooperateViewSet(viewsets.ModelViewSet):
+    queryset = RejectCooperate.objects.all()
+    serializer_class = RejectCooperateSerializer
+    permission_classes = (IsAuthenticated,)
+    authentication_classes = (TokenAuthentication,)
+
+    @action(detail=False, methods=['post'])
+    def take_all_rejected(self, request):
+        list_of_rejected_cooperate = RejectCooperate.objects.filter(send_info_to=request.data['pk'], is_active=True )
+        serializer = RejectCooperateSerializer(list_of_rejected_cooperate, many=True).data
+        return Response(serializer)
 
 
 class DoctorViewSet(viewsets.ModelViewSet):

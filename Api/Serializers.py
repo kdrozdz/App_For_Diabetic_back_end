@@ -1,6 +1,6 @@
 from rest_framework import serializers
 from accounts.models import Account
-from Api.models import Patient, Doctor, SugarLevel, Chat, Cooperate, Advice
+from Api.models import Patient, Doctor, SugarLevel, Chat, Cooperate, Advice, RejectCooperate
 
 
 class AccountCreateSerializer(serializers.ModelSerializer):
@@ -112,3 +112,8 @@ class AdviceListSerializer(serializers.ModelSerializer):
     class Meta:
         model = Advice
         exclude = ['patient','doctor',]
+
+class RejectCooperateSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = RejectCooperate
+        fields = '__all__'
