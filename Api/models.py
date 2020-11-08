@@ -30,18 +30,24 @@ class Cooperate(models.Model):
     accept_patient = models.BooleanField(default=False)
     accept_doctor = models.BooleanField(default=False)
     is_active = models.BooleanField(default=False)
-    show_rejected_first_time = models.BooleanField(default=False)
+    how_rejected = models.ForeignKey(Account, related_name='how_rejected', on_delete=models.DO_NOTHING, null=True, blank=True)
     rejected = models.BooleanField(default=False)
     message = models.TextField(max_length=256, blank=True)
     date = models.DateTimeField(auto_now_add=True)
 
+class RejectCooperate(models.Model):
+    how_rejected = models.ForeignKey(Account, related_name='reject_cooperate', on_delete=models.DO_NOTHING)
+    send_info_to = models.ForeignKey(Account, related_name='send_to', on_delete=models.DO_NOTHING)
+    is_active = models.BooleanField(default=True)
+    message = models.TextField()
 
 class Chat(models.Model):
-    sender = models.ForeignKey(Account, related_name='user_sender_email', on_delete=models.DO_NOTHING)
-    reciver = models.ForeignKey(Account, related_name='user_reciver_email', on_delete=models.DO_NOTHING)
+    sender = models.ForeignKey(Account, related_name='sender', on_delete=models.DO_NOTHING)
+    doctorId = models.ForeignKey(Account, related_name='user_sender_email', on_delete=models.DO_NOTHING)
+    patientId = models.ForeignKey(Account, related_name='user_reciver_email', on_delete=models.DO_NOTHING)
     is_new = models.BooleanField(default=True)
-    create_time = models.DateTimeField(auto_now_add=True)
-    msg = models.TextField()
+    date = models.DateTimeField(auto_now_add=True)
+    message = models.TextField()
 
 
 class Advice(models.Model):
@@ -50,6 +56,7 @@ class Advice(models.Model):
     message = models.TextField(max_length=512)
     is_new = models.BooleanField(default=True)
     date = models.DateTimeField(auto_now_add=True)
+
 
 
 

@@ -1,6 +1,6 @@
 from rest_framework import serializers
 from accounts.models import Account
-from Api.models import Patient, Doctor, SugarLevel, Chat, Cooperate, Advice
+from Api.models import Patient, Doctor, SugarLevel, Chat, Cooperate, Advice, RejectCooperate
 
 
 class AccountCreateSerializer(serializers.ModelSerializer):
@@ -45,15 +45,11 @@ class PatientDetailSerializer(PatientListSerializer):
 
 class DoctorGetSerializer(serializers.ModelSerializer):
     account = AccountGetSerializer(many=False)
-    # patients = serializers.SerializerMethodField('get_patient')
 
     class Meta:
         model = Doctor
         fields = 'account',
 
-    # def get_patients(self):
-    #     out_put = PatientListSerializer(self.objects.patient.all(),many=True).data
-    #     return out_put
 
 class DoctorListSerializer(serializers.ModelSerializer):
     account = AccountListSerializer(many=False)
@@ -116,3 +112,8 @@ class AdviceListSerializer(serializers.ModelSerializer):
     class Meta:
         model = Advice
         exclude = ['patient','doctor',]
+
+class RejectCooperateSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = RejectCooperate
+        fields = '__all__'
