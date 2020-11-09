@@ -275,9 +275,11 @@ class NewElements(viewsets.ModelViewSet):
     @action(detail=False, methods=['post'])
     def doctor(self, request):
         list_cooperate = len(Cooperate.objects.filter(doctor=request.data['pk'], rejected=False, is_active=False))
-        list_of_chat = ChatNewMessageSerializer(Chat.objects.filter(doctorId=request.data['pk'], is_new=True ).filter(~Q(sender=request.data['pk'])), many=True).data
+        list_active_cooperate_id = [x.patient for x in Cooperate.objects.filter(doctor=request.data['pk'], is_active=True )]
+        list_of_chat = ChatNewMessageSerializer(Chat.objects.filter(doctorId=request.data['pk'], patientId__in=list_active_cooperate_id , is_new=True ).filter(~Q(sender=request.data['pk'])), many=True).data
         outPut ={
             'list_of_chat':list_of_chat,
             'list_cooperate':list_cooperate
         }
+
         return Response(outPut)
