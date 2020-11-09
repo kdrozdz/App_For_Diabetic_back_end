@@ -5,7 +5,7 @@ from rest_framework.authentication import TokenAuthentication
 from Api.Serializers import AccountCreateSerializer, AccountGetSerializer, PatientListSerializer, \
     PatientDetailSerializer, DoctorGetSerializer, SugarLevelCreateSerializer, CooperateNewSerializer, \
     CooperateGetSerializer, SugarLevelGetSerializer, DoctorListSerializer, \
-    CooperateCreateSerializer, AdviceCreateSerializer, AdviceListSerializer, ChatSerializer, RejectCooperateSerializer
+    CooperateCreateSerializer, AdviceCreateSerializer, AdviceListSerializer, ChatSerializer, RejectCooperateSerializer, ChatNewMessageSerializer
 
 from Api.models import Patient, Doctor, Cooperate, SugarLevel, Advice, Chat, RejectCooperate
 from rest_framework.permissions import IsAuthenticated, AllowAny
@@ -13,6 +13,7 @@ from rest_framework.authtoken.views import ObtainAuthToken
 from rest_framework.authtoken.models import Token
 from rest_framework.response import Response
 from rest_framework.authtoken.serializers import AuthTokenSerializer
+from django.db.models import Q
 
 
 class CustomObtainAuthToken(ObtainAuthToken):
@@ -264,8 +265,19 @@ class ChatViewSet(viewsets.ModelViewSet):
         serializer = ChatSerializer(messages, many=True)
 
         return Response(serializer.data)
-    # @action(detail=False, methods=['post'])
-    # def new_msg(self, request, *args, **kwargs):
-    #     msg = Email.objects.filter(reciver=request.data['rId']).filter(is_new=True)
-    #     serializer = EmailSerializer(msg, many=True)
-    #     return Response(serializer.data)
+
+class NewElements(viewsets.ModelViewSet):
+    queryset = Chat.objects.all()
+    serializer_class = ChatSerializer
+    permission_classes = (IsAuthenticated,)
+    authentication_classes = (TokenAuthentication,)
+
+    @action(detail=False, methods=['post'])
+    def doctor(self, request):
+        list_cooperate = len(Cooperate.objects.filter(doctor=request.data['pk'], rejected=False, is_active=False))
+        list_of_chat = ChatNewMessageSerializer(Chat.objects.filter(doctorId=request.data['pk'], is_new=True ).filter(~Q(sender=request.data['pk'])), many=True).data
+        outPut ={
+            'list_of_chat':list_of_chat,
+            'list_cooperate':list_cooperate
+        }
+        return Response(outPut)

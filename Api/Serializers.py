@@ -117,3 +117,9 @@ class RejectCooperateSerializer(serializers.ModelSerializer):
     class Meta:
         model = RejectCooperate
         fields = '__all__'
+
+
+class ChatNewMessageSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = Chat
+        fields = ['sender', 'doctorId', 'patientId']
