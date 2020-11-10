@@ -14,7 +14,7 @@ from rest_framework.authtoken.models import Token
 from rest_framework.response import Response
 from rest_framework.authtoken.serializers import AuthTokenSerializer
 from django.db.models import Q
-
+from collections import Counter
 
 class CustomObtainAuthToken(ObtainAuthToken):
     serializer_class = AuthTokenSerializer
@@ -274,12 +274,14 @@ class NewElements(viewsets.ModelViewSet):
 
     @action(detail=False, methods=['post'])
     def doctor(self, request):
-        list_cooperate = len(Cooperate.objects.filter(doctor=request.data['pk'], rejected=False, is_active=False))
-        list_active_cooperate_id = [x.patient for x in Cooperate.objects.filter(doctor=request.data['pk'], is_active=True )]
-        list_of_chat = ChatNewMessageSerializer(Chat.objects.filter(doctorId=request.data['pk'], patientId__in=list_active_cooperate_id , is_new=True ).filter(~Q(sender=request.data['pk'])), many=True).data
-        outPut ={
-            'list_of_chat':list_of_chat,
+        pk_form_request = request.data['pk']
+        list_cooperate = len(Cooperate.objects.filter(doctor=pk_form_request, rejected=False, is_active=False))
+        list_active_cooperate_id = [x.patient for x in Cooperate.objects.filter(doctor=pk_form_request, is_active=True )]
+        list_of_chat = Chat.objects.filter(doctorId=pk_form_request, patientId__in=list_active_cooperate_id , is_new=True ).filter(~Q(sender=pk_form_request))
+        chat_patient_id_new_msg = [x.patientId.id for x in list_of_chat]
+        out_put ={
+            'chat_all_new_msg': len(chat_patient_id_new_msg),
+            'chat_patient_id_new_msg':dict(Counter(chat_patient_id_new_msg)),
             'list_cooperate':list_cooperate
         }
-
-        return Response(outPut)
+        return Response(out_put)
