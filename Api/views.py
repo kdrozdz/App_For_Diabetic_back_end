@@ -285,3 +285,14 @@ class NewElements(viewsets.ModelViewSet):
             'list_cooperate':list_cooperate
         }
         return Response(out_put)
+
+    @action(detail=False, methods=['post'])
+    def patient(self, request):
+        pk_form_request = request.data['pk']
+        new_msg_items = len(Chat.objects.filter(patientId=pk_form_request, is_new=True).filter(~Q(sender=pk_form_request)))
+        out_put = {
+            'new_msg_items': new_msg_items
+        }
+        import pdb;
+        pdb.set_trace()
+        return Response(out_put)
