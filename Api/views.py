@@ -244,7 +244,7 @@ class AdviceViewSet(viewsets.ModelViewSet):
 
     @action(detail=False, methods=['post'])
     def for_patient(self,request):
-        serializer = AdviceListSerializer(Advice.objects.filter(patient=request.data['pk']),many=True).data
+        serializer = AdviceListSerializer(Advice.objects.filter(patient=request.data['pk']).order_by('-date'), many=True).data
         return Response(serializer)
 
 class ChatViewSet(viewsets.ModelViewSet):
@@ -293,6 +293,4 @@ class NewElements(viewsets.ModelViewSet):
         out_put = {
             'new_msg_items': new_msg_items
         }
-        import pdb;
-        pdb.set_trace()
         return Response(out_put)
