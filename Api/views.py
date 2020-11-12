@@ -290,7 +290,9 @@ class NewElements(viewsets.ModelViewSet):
     def patient(self, request):
         pk_form_request = request.data['pk']
         new_msg_items = len(Chat.objects.filter(patientId=pk_form_request, is_new=True).filter(~Q(sender=pk_form_request)))
+        new_advices = len(Advice.objects.filter(patient=pk_form_request, is_new=True))
         out_put = {
-            'new_msg_items': new_msg_items
+            'new_msg_items': new_msg_items,
+            'new_advices': new_advices
         }
         return Response(out_put)
