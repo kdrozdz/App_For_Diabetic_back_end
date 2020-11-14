@@ -57,6 +57,18 @@ class Advice(models.Model):
     is_new = models.BooleanField(default=True)
     date = models.DateTimeField(auto_now_add=True)
 
+FOOD_CATEGORY = [
+    (1, 'Meats'),
+    (2, 'Vegetables'),
+    (3, 'Fruits'),
+    (4, 'Baking'),
+    (5, 'Sweets'),
+    (6, 'Other')
+]
 
-
-
+class Food(models.Model):
+    patient = models.ManyToManyField(Account, related_name='food')
+    name = models.TextField(max_length=64)
+    carbs = models.FloatField()
+    category = models.IntegerField(default=6, choices=FOOD_CATEGORY)
+    for_every_one = models.BooleanField(default=False)

@@ -30,6 +30,7 @@ ALLOWED_HOSTS = ['*']
 
 
 
+
 # Application definition
 
 INSTALLED_APPS = [
@@ -39,11 +40,11 @@ INSTALLED_APPS = [
     'django.contrib.sessions',
     'django.contrib.messages',
     'django.contrib.staticfiles',
-    'Api',
     'rest_framework',
     'rest_framework.authtoken',
     'corsheaders',
-    'accounts',
+    'accounts.apps.AccountsConfig',
+    'Api.apps.ApiConfig',
 ]
 
 MIDDLEWARE = [
@@ -155,3 +156,4 @@ REST_FRAMEWORK ={
     'DEFAULT_FILTER_BACKENDS': ['django_filters.rest_framework.DjangoFilterBackend']
 
 }
+

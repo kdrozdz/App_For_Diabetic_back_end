@@ -1,6 +1,6 @@
 from rest_framework import serializers
 from accounts.models import Account
-from Api.models import Patient, Doctor, SugarLevel, Chat, Cooperate, Advice, RejectCooperate
+from Api.models import Patient, Doctor, SugarLevel, Chat, Cooperate, Advice, RejectCooperate, Food
 
 
 class AccountCreateSerializer(serializers.ModelSerializer):
@@ -123,3 +123,9 @@ class ChatNewMessageSerializer(serializers.ModelSerializer):
     class Meta:
         model = Chat
         fields = ['sender', 'doctorId', 'patientId']
+
+
+class FoodSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = Food
+        fields = '__all__'

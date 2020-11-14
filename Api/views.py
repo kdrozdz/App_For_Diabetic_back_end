@@ -3,11 +3,11 @@ from accounts.models import Account
 from rest_framework import viewsets, status
 from rest_framework.authentication import TokenAuthentication
 from Api.Serializers import AccountCreateSerializer, AccountGetSerializer, PatientListSerializer, \
-    PatientDetailSerializer, DoctorGetSerializer, SugarLevelCreateSerializer, CooperateNewSerializer, \
-    CooperateGetSerializer, SugarLevelGetSerializer, DoctorListSerializer, \
-    CooperateCreateSerializer, AdviceCreateSerializer, AdviceListSerializer, ChatSerializer, RejectCooperateSerializer, ChatNewMessageSerializer
+    PatientDetailSerializer, DoctorGetSerializer, SugarLevelCreateSerializer, CooperateNewSerializer,\
+    CooperateGetSerializer, SugarLevelGetSerializer, DoctorListSerializer, CooperateCreateSerializer, \
+    AdviceCreateSerializer, AdviceListSerializer, ChatSerializer, RejectCooperateSerializer, FoodSerializer
 
-from Api.models import Patient, Doctor, Cooperate, SugarLevel, Advice, Chat, RejectCooperate
+from Api.models import Patient, Doctor, Cooperate, SugarLevel, Advice, Chat, RejectCooperate, Food
 from rest_framework.permissions import IsAuthenticated, AllowAny
 from rest_framework.authtoken.views import ObtainAuthToken
 from rest_framework.authtoken.models import Token
@@ -266,7 +266,7 @@ class ChatViewSet(viewsets.ModelViewSet):
 
         return Response(serializer.data)
 
-class NewElements(viewsets.ModelViewSet):
+class NewElementsViewSet(viewsets.ModelViewSet):
     queryset = Chat.objects.all()
     serializer_class = ChatSerializer
     permission_classes = (IsAuthenticated,)
@@ -296,3 +296,9 @@ class NewElements(viewsets.ModelViewSet):
             'new_advices': new_advices
         }
         return Response(out_put)
+
+class FoodViewSet(viewsets.ModelViewSet):
+    queryset = Food.objects.all()
+    serializer_class = FoodSerializer
+    permission_classes = (IsAuthenticated,)
+    authentication_classes = (TokenAuthentication,)
