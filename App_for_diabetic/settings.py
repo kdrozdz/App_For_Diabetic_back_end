@@ -30,6 +30,7 @@ ALLOWED_HOSTS = ['*']
 
 
 
+
 # Application definition
 
 INSTALLED_APPS = [
@@ -39,11 +40,11 @@ INSTALLED_APPS = [
     'django.contrib.sessions',
     'django.contrib.messages',
     'django.contrib.staticfiles',
-    'Api',
     'rest_framework',
     'rest_framework.authtoken',
     'corsheaders',
-    'accounts',
+    'accounts.apps.AccountsConfig',
+    'Api.apps.ApiConfig',
 ]
 
 MIDDLEWARE = [
@@ -63,8 +64,10 @@ ROOT_URLCONF = 'App_for_diabetic.urls'
 
 CORS_ORIGIN_WHITELIST = [
     'http://localhost:3000',
+    'http://localhost:3001',
+    'http://localhost:3002',
+    'http://localhost:3003',
     'https://app-for-diabetic-react.herokuapp.com',
-
 ]
 
 TEMPLATES = [
@@ -153,3 +156,4 @@ REST_FRAMEWORK ={
     'DEFAULT_FILTER_BACKENDS': ['django_filters.rest_framework.DjangoFilterBackend']
 
 }
+

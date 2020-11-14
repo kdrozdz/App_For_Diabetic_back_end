@@ -3,17 +3,18 @@ from accounts.models import Account
 from rest_framework import viewsets, status
 from rest_framework.authentication import TokenAuthentication
 from Api.Serializers import AccountCreateSerializer, AccountGetSerializer, PatientListSerializer, \
-    PatientDetailSerializer, DoctorGetSerializer, SugarLevelCreateSerializer, CooperateNewSerializer, \
-    CooperateGetSerializer, SugarLevelGetSerializer, DoctorListSerializer, \
-    CooperateCreateSerializer, AdviceCreateSerializer, AdviceListSerializer, ChatSerializer, RejectCooperateSerializer
+    PatientDetailSerializer, DoctorGetSerializer, SugarLevelCreateSerializer, CooperateNewSerializer,\
+    CooperateGetSerializer, SugarLevelGetSerializer, DoctorListSerializer, CooperateCreateSerializer, \
+    AdviceCreateSerializer, AdviceListSerializer, ChatSerializer, RejectCooperateSerializer, FoodSerializer
 
-from Api.models import Patient, Doctor, Cooperate, SugarLevel, Advice, Chat, RejectCooperate
+from Api.models import Patient, Doctor, Cooperate, SugarLevel, Advice, Chat, RejectCooperate, Food
 from rest_framework.permissions import IsAuthenticated, AllowAny
 from rest_framework.authtoken.views import ObtainAuthToken
 from rest_framework.authtoken.models import Token
 from rest_framework.response import Response
 from rest_framework.authtoken.serializers import AuthTokenSerializer
-
+from django.db.models import Q
+from collections import Counter
 
 class CustomObtainAuthToken(ObtainAuthToken):
     serializer_class = AuthTokenSerializer
@@ -243,7 +244,7 @@ class AdviceViewSet(viewsets.ModelViewSet):
 
     @action(detail=False, methods=['post'])
     def for_patient(self,request):
-        serializer = AdviceListSerializer(Advice.objects.filter(patient=request.data['pk']),many=True).data
+        serializer = AdviceListSerializer(Advice.objects.filter(patient=request.data['pk']).order_by('-date'), many=True).data
         return Response(serializer)
 
 class ChatViewSet(viewsets.ModelViewSet):
@@ -264,8 +265,40 @@ class ChatViewSet(viewsets.ModelViewSet):
         serializer = ChatSerializer(messages, many=True)
 
         return Response(serializer.data)
-    # @action(detail=False, methods=['post'])
-    # def new_msg(self, request, *args, **kwargs):
-    #     msg = Email.objects.filter(reciver=request.data['rId']).filter(is_new=True)
-    #     serializer = EmailSerializer(msg, many=True)
-    #     return Response(serializer.data)
+
+class NewElementsViewSet(viewsets.ModelViewSet):
+    queryset = Chat.objects.all()
+    serializer_class = ChatSerializer
+    permission_classes = (IsAuthenticated,)
+    authentication_classes = (TokenAuthentication,)
+
+    @action(detail=False, methods=['post'])
+    def doctor(self, request):
+        pk_form_request = request.data['pk']
+        list_cooperate = len(Cooperate.objects.filter(doctor=pk_form_request, rejected=False, is_active=False))
+        list_active_cooperate_id = [x.patient for x in Cooperate.objects.filter(doctor=pk_form_request, is_active=True )]
+        list_of_chat = Chat.objects.filter(doctorId=pk_form_request, patientId__in=list_active_cooperate_id , is_new=True ).filter(~Q(sender=pk_form_request))
+        chat_patient_id_new_msg = [x.patientId.id for x in list_of_chat]
+        out_put ={
+            'chat_all_new_msg': len(chat_patient_id_new_msg),
+            'chat_patient_id_new_msg':dict(Counter(chat_patient_id_new_msg)),
+            'list_cooperate':list_cooperate
+        }
+        return Response(out_put)
+
+    @action(detail=False, methods=['post'])
+    def patient(self, request):
+        pk_form_request = request.data['pk']
+        new_msg_items = len(Chat.objects.filter(patientId=pk_form_request, is_new=True).filter(~Q(sender=pk_form_request)))
+        new_advices = len(Advice.objects.filter(patient=pk_form_request, is_new=True))
+        out_put = {
+            'new_msg_items': new_msg_items,
+            'new_advices': new_advices
+        }
+        return Response(out_put)
+
+class FoodViewSet(viewsets.ModelViewSet):
+    queryset = Food.objects.all()
+    serializer_class = FoodSerializer
+    permission_classes = (IsAuthenticated,)
+    authentication_classes = (TokenAuthentication,)

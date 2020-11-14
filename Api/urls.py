@@ -1,7 +1,7 @@
 from django.urls import path
 from rest_framework import routers
 from Api.views import AccountViewSet, PatientViewSet, CooperateViewSet, \
-    SugarLeveViewSet, DoctorViewSet, AdviceViewSet, ChatViewSet, RejectCooperateViewSet
+    SugarLeveViewSet, DoctorViewSet, AdviceViewSet, ChatViewSet, RejectCooperateViewSet, NewElementsViewSet, FoodViewSet
 from django.conf.urls import include
 
 router = routers.DefaultRouter()
@@ -13,6 +13,8 @@ router.register('sugar', SugarLeveViewSet)
 router.register('doctor', DoctorViewSet)
 router.register('advice', AdviceViewSet)
 router.register('chat', ChatViewSet),
+router.register('new-elements', NewElementsViewSet),
+router.register('food', FoodViewSet),
 
 urlpatterns = (
     path('', include(router.urls)),
