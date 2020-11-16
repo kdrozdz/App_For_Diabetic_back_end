@@ -302,3 +302,10 @@ class FoodViewSet(viewsets.ModelViewSet):
     serializer_class = FoodSerializer
     permission_classes = (IsAuthenticated,)
     authentication_classes = (TokenAuthentication,)
+
+    def create(self, request):
+        if Food.objects.filter(name=request.data['name']).exists():
+            return Response('You already have item with this name !')
+        super(FoodViewSet, self).create(request)
+        return Response('Added')
+
