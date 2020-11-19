@@ -5,7 +5,8 @@ from rest_framework.authentication import TokenAuthentication
 from Api.Serializers import AccountCreateSerializer, AccountGetSerializer, PatientListSerializer, \
     PatientDetailSerializer, DoctorGetSerializer, SugarLevelCreateSerializer, CooperateNewSerializer,\
     CooperateGetSerializer, SugarLevelGetSerializer, DoctorListSerializer, CooperateCreateSerializer, \
-    AdviceCreateSerializer, AdviceListSerializer, ChatSerializer, RejectCooperateSerializer, FoodSerializer
+    AdviceCreateSerializer, AdviceListSerializer, ChatSerializer, RejectCooperateSerializer, \
+    FoodCreateSerializer, FoodListSerializer
 
 from Api.models import Patient, Doctor, Cooperate, SugarLevel, Advice, Chat, RejectCooperate, Food
 from rest_framework.permissions import IsAuthenticated, AllowAny
@@ -303,12 +304,16 @@ class NewElementsViewSet(viewsets.ModelViewSet):
 
 class FoodViewSet(viewsets.ModelViewSet):
     queryset = Food.objects.all()
-    serializer_class = FoodSerializer
     permission_classes = (IsAuthenticated,)
     authentication_classes = (TokenAuthentication,)
     filter_backends = (DjangoFilterBackend, OrderingFilter)
     filter_fields = ('category', 'units', 'patient')
     ordering_fields = ('name',)
+
+    def get_serializer_class(self):
+        if self.action == 'list':
+             return FoodListSerializer
+        return FoodCreateSerializer
 
     def create(self, request, **kwargs):
         if Food.objects.filter(name=request.data['name'], patient=request.data['patient']).exists():
