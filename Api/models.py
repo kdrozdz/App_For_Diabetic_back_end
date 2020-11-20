@@ -66,9 +66,15 @@ FOOD_CATEGORY = [
     (6, 'Other')
 ]
 
+UNITS= [
+    (1, '100g'),
+    (2, '10g'),
+    (3, 'psc'),
+]
+
 class Food(models.Model):
-    patient = models.ManyToManyField(Account, related_name='food')
+    patient = models.ForeignKey(Account, related_name='food', on_delete=models.CASCADE)
     name = models.TextField(max_length=64)
     carbs = models.FloatField()
     category = models.IntegerField(default=6, choices=FOOD_CATEGORY)
-    for_every_one = models.BooleanField(default=False)
+    units = models.IntegerField(default=1, choices=UNITS)

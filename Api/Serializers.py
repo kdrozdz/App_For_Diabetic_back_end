@@ -125,7 +125,13 @@ class ChatNewMessageSerializer(serializers.ModelSerializer):
         fields = ['sender', 'doctorId', 'patientId']
 
 
-class FoodSerializer(serializers.ModelSerializer):
+class FoodCreateSerializer(serializers.ModelSerializer):
     class Meta:
         model = Food
         fields = '__all__'
+
+class FoodListSerializer(serializers.ModelSerializer):
+    category = serializers.CharField(source='get_category_display')
+    class Meta:
+        model = Food
+        fields = ['patient', 'name', 'carbs', 'category', 'units' ]
