@@ -132,6 +132,7 @@ class FoodCreateSerializer(serializers.ModelSerializer):
 
 class FoodListSerializer(serializers.ModelSerializer):
     category = serializers.CharField(source='get_category_display')
+    units = serializers.CharField(source='get_units_display')
     class Meta:
         model = Food
         fields = ['patient', 'name', 'carbs', 'category', 'units' ]
