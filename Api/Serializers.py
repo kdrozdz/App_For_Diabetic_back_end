@@ -56,12 +56,13 @@ class DoctorListSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = Doctor
-        fields = ['account',]
+        fields = ['account', ]
 
 
 class CooperateGetSerializer(serializers.ModelSerializer):
     doctor = AccountGetSerializer(many=False)
     patient = AccountGetSerializer(many=False)
+
     class Meta:
         model = Cooperate
         fields = ['doctor', 'patient', 'message', 'date', 'id', 'is_active']
@@ -69,6 +70,7 @@ class CooperateGetSerializer(serializers.ModelSerializer):
 
 class CooperateNewSerializer(serializers.ModelSerializer):
     patient = AccountGetSerializer(many=False)
+
     class Meta:
         model = Cooperate
         fields = ['patient', 'message', 'date', 'id']
@@ -91,48 +93,60 @@ class SugarLevelGetSerializer(serializers.ModelSerializer):
         model = SugarLevel
         exclude = ['account', ]
 
+
 class SugarLevelCreateSerializer(serializers.ModelSerializer):
+
     class Meta:
         model = SugarLevel
         fields = '__all__'
 
 
 class ChatSerializer(serializers.ModelSerializer):
+
     class Meta:
         model = Chat
         fields = '__all__'
 
 
 class AdviceCreateSerializer(serializers.ModelSerializer):
+
     class Meta:
         model = Advice
         fields = '__all__'
 
+
 class AdviceListSerializer(serializers.ModelSerializer):
+
     class Meta:
         model = Advice
-        exclude = ['patient','doctor',]
+        exclude = ['patient', 'doctor']
+
 
 class RejectCooperateSerializer(serializers.ModelSerializer):
+
     class Meta:
         model = RejectCooperate
         fields = '__all__'
 
 
 class ChatNewMessageSerializer(serializers.ModelSerializer):
+
     class Meta:
         model = Chat
         fields = ['sender', 'doctorId', 'patientId']
 
 
 class FoodCreateSerializer(serializers.ModelSerializer):
+
     class Meta:
         model = Food
         fields = '__all__'
 
+
 class FoodListSerializer(serializers.ModelSerializer):
     category = serializers.CharField(source='get_category_display')
     units = serializers.CharField(source='get_units_display')
+
     class Meta:
         model = Food
-        fields = ['patient', 'name', 'carbs', 'category', 'units' ]
+        fields = ['id', 'patient', 'name', 'carbs', 'category', 'units']

@@ -24,8 +24,14 @@ class TestFoodCreate(APITestCase):
                                                'name': 'Test',
                                                'carbs': 60,
                                                })
-        self.assertEqual(response.status_code, status.HTTP_201_CREATED)
-        self.assertEqual(response.data['patient'], [1])
-        self.assertEqual(response.data['name'], 'Test')
-        self.assertEqual(response.data['carbs'], 60)
-        self.assertEqual(response.data['category'], 6)
+        self.assertEqual(response.status_code, status.HTTP_200_OK)
+
+        self.assertEqual(response.data, 'Added')
+        response2 = self.client.post(self.url, {'patient': self.patient.id,
+                                               'name': 'Test',
+                                               'carbs': 60,
+                                               })
+        import pdb;
+        pdb.set_trace()
+        self.assertEqual(response2.status_code, status.HTTP_200_OK)
+        self.assertEqual(response.data, 'You already have item with this name !')

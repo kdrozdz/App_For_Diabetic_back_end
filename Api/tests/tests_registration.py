@@ -1,5 +1,5 @@
 from rest_framework.exceptions import ErrorDetail
-from  rest_framework.test import APITestCase
+from rest_framework.test import APITestCase
 from rest_framework import status
 from Api.tests.data import Init
 

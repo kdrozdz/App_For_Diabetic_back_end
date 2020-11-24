@@ -2,6 +2,7 @@ from Api.models import Patient, Doctor
 from rest_framework.test import APITestCase
 from Api.tests.data import Init
 
+
 class CreateProfileTestCase(APITestCase):
 
     data = Init()
