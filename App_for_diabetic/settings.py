@@ -11,6 +11,7 @@ https://docs.djangoproject.com/en/3.0/ref/settings/
 """
 
 import os
+import dj_database_url
 
 
 # Build paths inside the project like this: os.path.join(BASE_DIR, ...)
@@ -21,7 +22,7 @@ BASE_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 # See https://docs.djangoproject.com/en/3.0/howto/deployment/checklist/
 
 # SECURITY WARNING: keep the secret key used in production secret!
-SECRET_KEY = os.environ.get('SECRET_KEY' , default='123')
+SECRET_KEY = os.environ.get('SECRET_KEY', default='123')
 
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = True
@@ -42,7 +43,6 @@ INSTALLED_APPS = [
     'django.contrib.staticfiles',
     'accounts.apps.AccountsConfig',
     'Api.apps.ApiConfig',
-
     'rest_framework',
     'rest_framework.authtoken',
     'corsheaders',
@@ -75,9 +75,8 @@ CORS_ORIGIN_WHITELIST = [
 TEMPLATES = [
     {
         'BACKEND': 'django.template.backends.django.DjangoTemplates',
-        'DIRS': []
-        # 'DIRS': [os.path.join(BASE_DIR, 'templates')]
-        ,
+        'DIRS': [],
+        # 'DIRS': [os.path.join(BASE_DIR, 'templates')],
         'APP_DIRS': True,
         'OPTIONS': {
             'context_processors': [
@@ -103,7 +102,6 @@ DATABASES = {
     }
 }
 
-import dj_database_url
 DATABASE_URL = os.environ.get('DATABASE_URL')
 db_from_env = dj_database_url.config(default=DATABASE_URL, conn_max_age=500, ssl_require=True)
 DATABASES['default'].update(db_from_env)
@@ -151,11 +149,10 @@ STATIC_URL = '/static/'
 
 AUTH_USER_MODEL = 'accounts.Account'
 
-REST_FRAMEWORK ={
-    'DEFAULT_PERMISSION_CLASSES':[
+REST_FRAMEWORK = {
+    'DEFAULT_PERMISSION_CLASSES': [
         "rest_framework.permissions.IsAuthenticated"
     ],
     'DEFAULT_FILTER_BACKENDS': ['django_filters.rest_framework.DjangoFilterBackend']
 
 }
-

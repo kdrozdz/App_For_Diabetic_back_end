@@ -35,11 +35,13 @@ class Cooperate(models.Model):
     message = models.TextField(max_length=256, blank=True)
     date = models.DateTimeField(auto_now_add=True)
 
+
 class RejectCooperate(models.Model):
     how_rejected = models.ForeignKey(Account, related_name='reject_cooperate', on_delete=models.DO_NOTHING)
     send_info_to = models.ForeignKey(Account, related_name='send_to', on_delete=models.DO_NOTHING)
     is_active = models.BooleanField(default=True)
     message = models.TextField()
+
 
 class Chat(models.Model):
     sender = models.ForeignKey(Account, related_name='sender', on_delete=models.DO_NOTHING)
@@ -57,6 +59,7 @@ class Advice(models.Model):
     is_new = models.BooleanField(default=True)
     date = models.DateTimeField(auto_now_add=True)
 
+
 FOOD_CATEGORY = [
     (1, 'Meats'),
     (2, 'Vegetables'),
@@ -66,11 +69,12 @@ FOOD_CATEGORY = [
     (6, 'Other')
 ]
 
-UNITS= [
+UNITS = [
     (1, '100g'),
     (2, '10g'),
     (3, 'psc'),
 ]
+
 
 class Food(models.Model):
     patient = models.ForeignKey(Account, related_name='food', on_delete=models.CASCADE)

@@ -92,8 +92,9 @@ class PatientViewSet(viewsets.ModelViewSet):
         return Response(out_put)
 
     def retrieve(self, request, *args, **kwargs):
-        serialzier= PatientDetailSerializer(Patient.objects.get(account=kwargs['pk']), many=False).data
+        serialzier = PatientDetailSerializer(Patient.objects.get(account=kwargs['pk']), many=False).data
         return Response(serialzier, status=status.HTTP_200_OK)
+
 
 class CooperateViewSet(viewsets.ModelViewSet):
     queryset = Cooperate.objects.all()
@@ -131,9 +132,7 @@ class CooperateViewSet(viewsets.ModelViewSet):
         patient.doctor = None
         cooperte_obj.rejected = True
         cooperte_obj.is_active = False
-
         account_how_removed = Account.objects.get(id=request.data['how_removed'])
-        send_info_to = 0
         if cooperte_obj.patient.id == request.data['how_removed']:
             send_info_to = cooperte_obj.doctor.id
         else:
@@ -153,7 +152,6 @@ class CooperateViewSet(viewsets.ModelViewSet):
         cooperte_obj = Cooperate.objects.get(id=request.data['pk'])
         cooperte_obj.rejected = True
         account_how_rejected = Account.objects.get(id=request.data['how_rejected'])
-        send_info_to = 0
         if cooperte_obj.patient.id == request.data['how_rejected']:
             send_info_to = cooperte_obj.doctor.id
         else:
@@ -161,7 +159,7 @@ class CooperateViewSet(viewsets.ModelViewSet):
         account_send_info_to = Account.objects.get(id=send_info_to)
         new_reject_cooperate = RejectCooperate.objects.create(how_rejected=account_how_rejected,
                                                               message=f'Cooperate was rejected by {account_how_rejected.email}',
-                                                              send_info_to=account_send_info_to )
+                                                              send_info_to=account_send_info_to)
         new_reject_cooperate.save()
         cooperte_obj.save()
         return Response(status.HTTP_200_OK)
@@ -178,6 +176,7 @@ class CooperateViewSet(viewsets.ModelViewSet):
         cooperate_obj.save()
         return Response(status.HTTP_200_OK)
 
+
 class RejectCooperateViewSet(viewsets.ModelViewSet):
     queryset = RejectCooperate.objects.all()
     serializer_class = RejectCooperateSerializer
@@ -186,7 +185,7 @@ class RejectCooperateViewSet(viewsets.ModelViewSet):
 
     @action(detail=False, methods=['post'])
     def take_all_rejected(self, request):
-        list_of_rejected_cooperate = RejectCooperate.objects.filter(send_info_to=request.data['pk'], is_active=True )
+        list_of_rejected_cooperate = RejectCooperate.objects.filter(send_info_to=request.data['pk'], is_active=True)
         serializer = RejectCooperateSerializer(list_of_rejected_cooperate, many=True).data
         return Response(serializer)
 
@@ -247,9 +246,10 @@ class AdviceViewSet(viewsets.ModelViewSet):
         return Response(status=status.HTTP_201_CREATED)
 
     @action(detail=False, methods=['post'])
-    def for_patient(self,request):
+    def for_patient(self, request):
         serializer = AdviceListSerializer(Advice.objects.filter(patient=request.data['pk']).order_by('-date'), many=True).data
         return Response(serializer)
+
 
 class ChatViewSet(viewsets.ModelViewSet):
     queryset = Chat.objects.all()
@@ -261,14 +261,12 @@ class ChatViewSet(viewsets.ModelViewSet):
     def conversation(self, request):
         patientId = request.data['patientId']
         doctorId = request.data['doctorId']
-
         messages = [x for x in Chat.objects.all().order_by('-date')
-                if x.patientId.id == int(doctorId) and x.doctorId.id == int(patientId)
-                or x.patientId.id == int(patientId) and x.doctorId.id == int(doctorId)]
-
+                    if x.patientId.id == int(doctorId) and x.doctorId.id == int(patientId)
+                    or x.patientId.id == int(patientId) and x.doctorId.id == int(doctorId)]
         serializer = ChatSerializer(messages, many=True)
-
         return Response(serializer.data)
+
 
 class NewElementsViewSet(viewsets.ModelViewSet):
     queryset = Chat.objects.all()
@@ -280,13 +278,13 @@ class NewElementsViewSet(viewsets.ModelViewSet):
     def doctor(self, request):
         pk_form_request = request.data['pk']
         list_cooperate = len(Cooperate.objects.filter(doctor=pk_form_request, rejected=False, is_active=False))
-        list_active_cooperate_id = [x.patient for x in Cooperate.objects.filter(doctor=pk_form_request, is_active=True )]
-        list_of_chat = Chat.objects.filter(doctorId=pk_form_request, patientId__in=list_active_cooperate_id , is_new=True ).filter(~Q(sender=pk_form_request))
+        list_active_cooperate_id = [x.patient for x in Cooperate.objects.filter(doctor=pk_form_request, is_active=True)]
+        list_of_chat = Chat.objects.filter(doctorId=pk_form_request, patientId__in=list_active_cooperate_id, is_new=True).filter(~Q(sender=pk_form_request))
         chat_patient_id_new_msg = [x.patientId.id for x in list_of_chat]
-        out_put ={
+        out_put = {
             'chat_all_new_msg': len(chat_patient_id_new_msg),
-            'chat_patient_id_new_msg':dict(Counter(chat_patient_id_new_msg)),
-            'list_cooperate':list_cooperate
+            'chat_patient_id_new_msg': dict(Counter(chat_patient_id_new_msg)),
+            'list_cooperate': list_cooperate
         }
         return Response(out_put)
 
@@ -312,7 +310,7 @@ class FoodViewSet(viewsets.ModelViewSet):
 
     def get_serializer_class(self):
         if self.action == 'list':
-             return FoodListSerializer
+            return FoodListSerializer
         return FoodCreateSerializer
 
     def create(self, request, **kwargs):
