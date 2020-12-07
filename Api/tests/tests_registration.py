@@ -16,7 +16,6 @@ class RegistrationTestCase(APITestCase):
     def test_registration_email_in_db(self):
         response = self.client.post("/accounts/", self.data.account_data_patient)
         self.assertEqual(response.status_code, status.HTTP_201_CREATED)
-
         response = self.client.post("/accounts/", self.data.account_data_patient)
         self.assertEqual(response.data, 'This email address is already being used')
 
