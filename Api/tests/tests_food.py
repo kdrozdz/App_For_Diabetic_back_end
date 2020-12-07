@@ -31,7 +31,5 @@ class TestFoodCreate(APITestCase):
                                                'name': 'Test',
                                                'carbs': 60,
                                                })
-        import pdb;
-        pdb.set_trace()
         self.assertEqual(response2.status_code, status.HTTP_200_OK)
-        self.assertEqual(response.data, 'You already have item with this name !')
+        self.assertEqual(response2.data, 'You already have item with this name !')

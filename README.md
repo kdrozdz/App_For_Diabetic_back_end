@@ -1,3 +1,5 @@
+Refactoring in progress ...
+
 djnago-rest-framework + React
 
 REST api drf (djnago rest framework)
