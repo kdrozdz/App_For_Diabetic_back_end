@@ -33,7 +33,7 @@ class TestSugarViews(APITestCase):
             self.assertEqual(response.status_code, status.HTTP_201_CREATED)
 
         response = self.client.post('/sugar/all_info/', {'pk': self.account.id})
-        self.assertEqual(response.data['avreage_all_fast_blood_sugar'], 172)
+        self.assertEqual(response.data['avreage_all_fast_blood_sugar'],  173)
         self.assertEqual(response.data['avreage_all_sugars'], 158)
         self.assertEqual(response.data['avreage_last_five_sugars'], 170)
         self.assertEqual(len(response.data['list_of_all_sugars']), 6)
