@@ -7,9 +7,9 @@ from Api.tests.data import Init
 
 class TestAuthenticatedViews(APITestCase):
 
-    url_accounts = '/accounts/'
+    url_accounts = '/account/'
     url_patient = '/patient/'
-    url_doctors = '/doctors/'
+    url_doctors = '/doctor/'
 
     def setUp(self):
         self.data = Init()
