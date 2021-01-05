@@ -6,7 +6,6 @@ from accounts.models import Account
 from rest_framework.authtoken.models import Token
 
 
-
 class TestSugarViews(APITestCase):
     url_sugar = '/sugar/'
     data = Init()

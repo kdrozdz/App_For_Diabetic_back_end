@@ -23,7 +23,6 @@ class SugarLeveViewSet(viewsets.ModelViewSet):
 
     @action(detail=False, methods=['post'])
     def all_info(self, request):
-
         serializer_list_all = SugarLevelGetSerializer(SugarLevel.objects.filter(account_id=request.data['pk'])
                                                       .order_by('-date'), many=True)
         avreage_all_sugars = SugarLevel.objects.filter(account_id=request.data['pk'])\

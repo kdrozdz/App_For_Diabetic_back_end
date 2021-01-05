@@ -1,10 +1,8 @@
 from rest_framework import status
 from rest_framework.test import APITestCase
-from Api.models import Patient, Doctor
 from Api.tests.data import Init
 from accounts.models import Account
 from rest_framework.authtoken.models import Token
-
 
 
 class TestCooperateViews(APITestCase):
@@ -27,7 +25,6 @@ class TestCooperateViews(APITestCase):
         self.assertEqual(response.status_code, status.HTTP_201_CREATED)
         self.assertEqual(response.data['patient'], 1)
         self.assertEqual(response.data['doctor'], 2)
-
 
     def test_i_have_sent_cooperate(self):
         first_response = self.client.post(self.url_cooperate + self.url_have_i_sent, {'pk': self.patient.id})
