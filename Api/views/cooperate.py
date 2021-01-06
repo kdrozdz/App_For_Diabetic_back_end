@@ -3,7 +3,6 @@ from rest_framework.response import Response
 from rest_framework.permissions import IsAuthenticated
 from rest_framework.authentication import TokenAuthentication
 from rest_framework.decorators import action
-from rest_framework.decorators import action
 
 from Api.models import Cooperate, Patient, Account, RejectCooperate, Doctor
 from Api.serializers import CooperateCreateSerializer, CooperateGetSerializer, CooperateNewSerializer, RejectCooperateSerializer
@@ -36,7 +35,6 @@ class CooperateViewSet(viewsets.ModelViewSet):
             response_obj['go_to_doctor_list'] = False
             return Response(response_obj)
         return Response({'go_to_doctor_list': True})
-
 
     @action(detail=False, methods=['post'])
     def remove_cooperate(self, request):

@@ -1,5 +1,3 @@
-from accounts.models import Account
-
 
 class Init:
     account_data_patient = {

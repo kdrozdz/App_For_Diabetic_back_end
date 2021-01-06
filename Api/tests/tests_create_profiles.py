@@ -12,6 +12,5 @@ class CreateProfileTestCase(APITestCase):
         self.assertEqual(len(Patient.objects.all()), 1)
 
     def test_doctor(self):
-
         self.client.post(self.url_account, self.data.account_data_doctor)
         self.assertEqual(len(Doctor.objects.all()), 1)

@@ -1,6 +1,5 @@
 from rest_framework import status
 from rest_framework.test import APITestCase
-from Api.models import Food
 from Api.tests.data import Init
 from accounts.models import Account
 from rest_framework.authtoken.models import Token
@@ -28,8 +27,8 @@ class TestFoodCreate(APITestCase):
 
         self.assertEqual(response.data, 'Added')
         response2 = self.client.post(self.url, {'patient': self.patient.id,
-                                               'name': 'Test',
-                                               'carbs': 60,
-                                               })
+                                                'name': 'Test',
+                                                'carbs': 60,
+                                                })
         self.assertEqual(response2.status_code, status.HTTP_200_OK)
         self.assertEqual(response2.data, 'You already have item with this name !')
