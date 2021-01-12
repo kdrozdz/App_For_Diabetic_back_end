@@ -22,4 +22,6 @@ class ChatViewSet(viewsets.ModelViewSet):
                     if x.patientId.id == int(doctorId) and x.doctorId.id == int(patientId)
                     or x.patientId.id == int(patientId) and x.doctorId.id == int(doctorId)]
         serializer = ChatSerializer(messages, many=True)
-        return Response(serializer.data)
+        return Response({"conversation": serializer.data,
+                         "isLoading": False,
+                         })
