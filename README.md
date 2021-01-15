@@ -1,19 +1,27 @@
-Refactoring in progress ...
+## App_For_Diabetic_back_end
 
-djnago-rest-framework + React
+DRF + React <br>
 
-REST api drf (djnago rest framework)
+DRF (Django rest framework)
 
-Two type of users
+Two type of users <br>
 
-Doctor : can add patient and he has view to all sugar levels of patient also average. can send message to patients
+Doctor: can add patient and he has view to all sugar levels of patient also average.<br>
 
-Patient : He can put sugar level , and he has an insight on his sugar levels. can send message to doctor
+Patient He can put a sugar level, and he has an insight on his sugar levels, can send a message to doctor and invite to cooperate. <br>
+He has also a calculator to carbohydrates, he can add a food items and sort them by category and units <br>
 
-While you're creating profile you have choice you can select doctor or patient , token will be created automatically
+They can chating each other  <br>
 
-Front React : 
-Heroku: https://app-for-diabetic-react.herokuapp.com/
+While you're creating profile you have choice you can select doctor or patient, token will be created automatically <br>
+
+I used: django-filter, django-cors-headers <br>
+I added a few tests
+
+App: https://app-for-diabetic-react.herokuapp.com/ <br>
+
+App_For_Diabetic_back_end: https://github.com/kdrozdz/App_For_Diabetic_back_end <br>
+
+Front React : <br>
+Live: https://app-for-diabetic-react.herokuapp.com/ <br>
 Git: https://github.com/kdrozdz/-App_For_Diabetic_front_end
-
-I used : django-rest-framework , django-filter , django-cors-headers
