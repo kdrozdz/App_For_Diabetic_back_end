@@ -2,7 +2,7 @@ from rest_framework import viewsets, status
 from rest_framework.response import Response
 from rest_framework.permissions import IsAuthenticated
 from rest_framework.authentication import TokenAuthentication
-from django.db.models import Q
+from django.db.models import Q, Count
 from collections import Counter
 from rest_framework.decorators import action
 
@@ -18,6 +18,8 @@ class NewElementsViewSet(viewsets.ModelViewSet):
     @action(detail=False, methods=['post'])
     def doctor(self, request):
         pk_from_request = request.data['pk']
+
+        list_cooperate_test = Count('book', filter=Q(book__rating__gt=5))
         list_cooperate = len(Cooperate.objects.filter(doctor=pk_from_request, rejected=False, is_active=False))
         list_active_cooperate_id = [x.patient for x in Cooperate.objects.filter(doctor=pk_from_request, is_active=True)]
         list_of_chat = Chat.objects.filter(doctorId=pk_from_request, patientId__in=list_active_cooperate_id, is_new=True).filter(~Q(sender=pk_from_request))
@@ -27,6 +29,8 @@ class NewElementsViewSet(viewsets.ModelViewSet):
             'chat_patient_id_new_msg': dict(Counter(chat_patient_id_new_msg)),
             'list_cooperate': list_cooperate
         }
+        import pdb;
+        pdb.set_trace()
         return Response(out_put)
 
     @action(detail=False, methods=['post'])
